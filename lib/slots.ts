@@ -11,25 +11,18 @@ export type SlotDef = {
 export function buildSlots(content: SiteContent): SlotDef[] {
   const slots: SlotDef[] = [
     {
-      key: "hero.heroImage",
+      key: "hero.image1",
       section: "Hero",
-      label: "Foto circular junto a “real”",
-      get: (c) => c.hero.heroImage,
-      set: (c, url) => ({ ...c, hero: { ...c.hero, heroImage: url } }),
+      label: "Foto 1 del hero (izquierda)",
+      get: (c) => c.hero.image1,
+      set: (c, url) => ({ ...c, hero: { ...c.hero, image1: url } }),
     },
     {
-      key: "hero.polaroid1",
+      key: "hero.image2",
       section: "Hero",
-      label: "Polaroid 1 (arriba a la derecha)",
-      get: (c) => c.hero.polaroid1.src,
-      set: (c, url) => ({ ...c, hero: { ...c.hero, polaroid1: { ...c.hero.polaroid1, src: url } } }),
-    },
-    {
-      key: "hero.polaroid2",
-      section: "Hero",
-      label: "Polaroid 2 (abajo)",
-      get: (c) => c.hero.polaroid2.src,
-      set: (c, url) => ({ ...c, hero: { ...c.hero, polaroid2: { ...c.hero.polaroid2, src: url } } }),
+      label: "Foto 2 del hero (derecha)",
+      get: (c) => c.hero.image2,
+      set: (c, url) => ({ ...c, hero: { ...c.hero, image2: url } }),
     },
     {
       key: "sobreMi.image",
