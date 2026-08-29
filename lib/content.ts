@@ -29,6 +29,7 @@ export type SiteContent = {
 /** All photos available in /public/photos, used by the admin picker. */
 export const PHOTO_LIBRARY = [
   "bikini-rosa.jpg",
+  "camiseta-argentina.jpg",
   "city-night.jpg",
   "mirror.jpg",
   "noche-espalda.jpg",
@@ -86,7 +87,7 @@ export const defaultContent: SiteContent = {
       id: "g3",
       src: "/photos/mirror.jpg",
       tag: "fits",
-      related: ["/photos/selfie-beige.jpg", "/photos/zebra-selfie.jpg", "/photos/vestido-noche.jpg"],
+      related: ["/photos/camiseta-argentina.jpg", "/photos/zebra-selfie.jpg", "/photos/vestido-noche.jpg"],
     },
     {
       id: "g4",
@@ -96,7 +97,7 @@ export const defaultContent: SiteContent = {
     },
     {
       id: "g5",
-      src: "/photos/selfie-beige.jpg",
+      src: "/photos/camiseta-argentina.jpg",
       tag: "on camera",
       related: ["/photos/zebra-selfie.jpg", "/photos/mirror.jpg"],
     },
@@ -104,7 +105,7 @@ export const defaultContent: SiteContent = {
       id: "g6",
       src: "/photos/ross.jpg",
       tag: "haul",
-      related: ["/photos/mirror.jpg", "/photos/selfie-beige.jpg"],
+      related: ["/photos/mirror.jpg", "/photos/camiseta-argentina.jpg"],
     },
     {
       id: "g7",
