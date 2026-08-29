@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Instrument_Serif, Archivo, Caveat } from "next/font/google";
+import { Instrument_Serif, Archivo } from "next/font/google";
 import "./globals.css";
 
 const instrumentSerif = Instrument_Serif({
@@ -12,13 +12,7 @@ const instrumentSerif = Instrument_Serif({
 const archivo = Archivo({
   variable: "--font-archivo",
   subsets: ["latin"],
-  weight: ["400", "500", "600", "700", "800"],
-});
-
-const caveat = Caveat({
-  variable: "--font-caveat",
-  subsets: ["latin"],
-  weight: "600",
+  weight: ["400", "500", "600", "700"],
 });
 
 export const metadata: Metadata = {
@@ -29,10 +23,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html
-      lang="es"
-      className={`${instrumentSerif.variable} ${archivo.variable} ${caveat.variable}`}
-    >
+    <html lang="es" className={`${instrumentSerif.variable} ${archivo.variable}`}>
       <body>{children}</body>
     </html>
   );

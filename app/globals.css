@@ -1,24 +1,18 @@
-html {
-  scroll-behavior: smooth;
-}
-
 html,
 body {
   margin: 0;
   padding: 0;
-  background: #f7f0e6;
+  background: #faf5ee;
 }
 
 body {
   font-family: var(--font-archivo), sans-serif;
-  color: #1e1812;
-  cursor: none;
+  color: #221b14;
 }
 
 a {
-  color: #1e1812;
+  color: #221b14;
   text-decoration: none;
-  cursor: none;
 }
 
 a:hover {
@@ -34,63 +28,13 @@ a:hover {
   }
 }
 
-@keyframes spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
-}
-
-@keyframes floaty {
-  0%,
-  100% {
-    transform: translateY(0) rotate(-3deg);
-  }
-  50% {
-    transform: translateY(-14px) rotate(-1deg);
-  }
-}
-
-@keyframes floaty2 {
-  0%,
-  100% {
-    transform: translateY(0) rotate(4deg);
-  }
-  50% {
-    transform: translateY(-10px) rotate(2deg);
-  }
-}
-
-[data-reveal] {
-  opacity: 0;
-  transform: translateY(46px);
-  transition:
-    opacity 0.9s cubic-bezier(0.16, 1, 0.3, 1),
-    transform 0.9s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-[data-reveal].on {
-  opacity: 1;
-  transform: translateY(0);
-}
-
 ::selection {
   background: #f2c9b8;
 }
 
-#strip {
-  scrollbar-width: none;
-}
-
-#strip::-webkit-scrollbar {
-  display: none;
-}
-
 .btn-dark {
-  background: #1e1812;
-  color: #f7f0e6;
+  background: #221b14;
+  color: #faf5ee;
   transition:
     background 0.25s ease,
     color 0.25s ease;
@@ -98,44 +42,31 @@ a:hover {
 
 .btn-dark:hover {
   background: #c4451c;
-  color: #f7f0e6;
+  color: #faf5ee;
 }
 
-.btn-outline {
-  border: 1.5px solid #1e1812;
+.btn-light {
+  background: #faf5ee;
+  color: #221b14;
+  transition:
+    background 0.25s ease,
+    color 0.25s ease;
+}
+
+.btn-light:hover {
+  background: #e8906b;
+  color: #221b14;
+}
+
+.btn-outline-light {
+  border: 1px solid #5c5248;
+  color: #faf5ee;
   transition:
     border-color 0.25s ease,
     color 0.25s ease;
 }
 
-.btn-outline:hover {
-  border-color: #c4451c;
-  color: #c4451c;
-}
-
-.contact-link:hover {
-  color: #c4451c;
-  font-style: italic;
-}
-
-.gallery-figure {
-  transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.gallery-figure:hover {
-  transform: rotate(0deg) scale(1.05) translateY(-10px);
-}
-
-.cta-link:hover {
-  background: #c4451c;
-}
-
-@media (max-width: 900px) {
-  body {
-    cursor: auto;
-  }
-  #cursor-dot,
-  #cursor-ring {
-    display: none !important;
-  }
+.btn-outline-light:hover {
+  border-color: #e8906b;
+  color: #e8906b;
 }
