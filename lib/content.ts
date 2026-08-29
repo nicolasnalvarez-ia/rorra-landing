@@ -8,6 +8,8 @@ export type GaleriaItem = {
   id: string;
   src: string;
   tag: string;
+  /** Additional photos of the same style, shown when the card is expanded. */
+  related: string[];
 };
 
 export type SiteContent = {
@@ -68,14 +70,54 @@ export const defaultContent: SiteContent = {
     },
   ],
   galeria: [
-    { id: "g1", src: "/photos/vestido-noche.jpg", tag: "night out" },
-    { id: "g2", src: "/photos/texas.jpg", tag: "travel" },
-    { id: "g3", src: "/photos/mirror.jpg", tag: "fits" },
-    { id: "g4", src: "/photos/pool.jpg", tag: "summer" },
-    { id: "g5", src: "/photos/selfie-beige.jpg", tag: "on camera" },
-    { id: "g6", src: "/photos/ross.jpg", tag: "haul" },
-    { id: "g7", src: "/photos/sushi.jpg", tag: "food" },
-    { id: "g8", src: "/photos/noche-espalda.jpg", tag: "glam" },
+    {
+      id: "g1",
+      src: "/photos/vestido-noche.jpg",
+      tag: "night out",
+      related: ["/photos/noche-espalda.jpg", "/photos/city-night.jpg"],
+    },
+    {
+      id: "g2",
+      src: "/photos/texas.jpg",
+      tag: "travel",
+      related: ["/photos/city-night.jpg", "/photos/pergola.jpg"],
+    },
+    {
+      id: "g3",
+      src: "/photos/mirror.jpg",
+      tag: "fits",
+      related: ["/photos/selfie-beige.jpg", "/photos/zebra-selfie.jpg", "/photos/vestido-noche.jpg"],
+    },
+    {
+      id: "g4",
+      src: "/photos/pool.jpg",
+      tag: "summer",
+      related: ["/photos/bikini-rosa.jpg", "/photos/pergola.jpg"],
+    },
+    {
+      id: "g5",
+      src: "/photos/selfie-beige.jpg",
+      tag: "on camera",
+      related: ["/photos/zebra-selfie.jpg", "/photos/mirror.jpg"],
+    },
+    {
+      id: "g6",
+      src: "/photos/ross.jpg",
+      tag: "haul",
+      related: ["/photos/mirror.jpg", "/photos/selfie-beige.jpg"],
+    },
+    {
+      id: "g7",
+      src: "/photos/sushi.jpg",
+      tag: "food",
+      related: ["/photos/city-night.jpg", "/photos/texas.jpg"],
+    },
+    {
+      id: "g8",
+      src: "/photos/noche-espalda.jpg",
+      tag: "glam",
+      related: ["/photos/vestido-noche.jpg", "/photos/zebra-selfie.jpg", "/photos/city-night.jpg"],
+    },
   ],
 };
 

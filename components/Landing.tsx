@@ -1,3 +1,4 @@
+import PortfolioGallery from "@/components/PortfolioGallery";
 import type { SiteContent } from "@/lib/content";
 
 const MARQUEE_TEXT =
@@ -209,9 +210,9 @@ export default function Landing({ content }: { content: SiteContent }) {
             Marketing, moda y una cámara siempre a mano.
           </h2>
           <p style={{ fontSize: 17, lineHeight: 1.7, color: "#5C5248", margin: 0 }}>
-            Argentina viviendo en Texas. Hago contenido desde antes de que fuera trabajo: probando
-            productos, contando historias y mostrando la vida como es. Las marcas me buscan porque mi
-            contenido no parece un aviso — parece una amiga recomendándote algo que le encantó.
+            Soy argentina y hago contenido desde antes de que fuera trabajo: probando productos,
+            contando historias y mostrando la vida como es. Las marcas me buscan porque mi contenido
+            no parece un aviso — parece una amiga recomendándote algo que le encantó.
           </p>
           <p style={{ fontSize: 17, lineHeight: 1.7, color: "#5C5248", margin: 0 }}>
             Grabo, edito y entrego listo para publicar. Español, inglés o los dos.
@@ -343,41 +344,7 @@ export default function Landing({ content }: { content: SiteContent }) {
             Un poco de lo que hago
           </h2>
         </div>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(220px, 1fr))", gap: 16 }}>
-          {content.galeria.map((g) => (
-            <figure
-              key={g.id}
-              style={{
-                margin: 0,
-                position: "relative",
-                borderRadius: 14,
-                overflow: "hidden",
-                boxShadow: "0 12px 28px rgba(34,27,20,0.12)",
-              }}
-            >
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src={g.src}
-                alt={g.tag}
-                style={{ width: "100%", aspectRatio: "3/4", objectFit: "cover", display: "block" }}
-              />
-              <figcaption
-                style={{
-                  position: "absolute",
-                  left: 10,
-                  bottom: 10,
-                  background: "rgba(250,245,238,0.92)",
-                  borderRadius: 999,
-                  padding: "5px 14px",
-                  fontSize: 12,
-                  fontWeight: 600,
-                }}
-              >
-                {g.tag}
-              </figcaption>
-            </figure>
-          ))}
-        </div>
+        <PortfolioGallery galeria={content.galeria} />
         <p style={{ textAlign: "center", fontSize: 15, color: "#5C5248", margin: 0 }}>
           Más en{" "}
           <a
