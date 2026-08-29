@@ -70,3 +70,241 @@ a:hover {
   border-color: #e8906b;
   color: #e8906b;
 }
+
+/* ── portfolio cards ── */
+.pf-card {
+  position: relative;
+  padding: 0;
+  border: none;
+  border-radius: 14px;
+  overflow: hidden;
+  cursor: pointer;
+  background: #221b14;
+  box-shadow: 0 12px 28px rgba(34, 27, 20, 0.12);
+  transition:
+    transform 0.45s cubic-bezier(0.16, 1, 0.3, 1),
+    box-shadow 0.45s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.pf-card img {
+  transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.pf-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 24px 48px rgba(34, 27, 20, 0.22);
+}
+
+.pf-card:hover img {
+  transform: scale(1.06);
+}
+
+.pf-card-hint {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: rgba(34, 27, 20, 0.82);
+  color: #faf5ee;
+  border-radius: 999px;
+  padding: 5px 14px;
+  font-size: 12px;
+  font-weight: 600;
+  opacity: 0;
+  transform: translateY(-6px);
+  transition:
+    opacity 0.35s ease,
+    transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+  pointer-events: none;
+}
+
+.pf-card:hover .pf-card-hint {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ── lightbox ── */
+@keyframes lbFadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes lbZoomIn {
+  from {
+    opacity: 0;
+    transform: scale(0.92) translateY(24px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+@keyframes lbImgIn {
+  from {
+    opacity: 0;
+    transform: scale(1.03);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.lb-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  background: rgba(20, 15, 10, 0.78);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  animation: lbFadeIn 0.3s ease both;
+  transition: opacity 0.28s ease;
+}
+
+.lb-backdrop.lb-closing {
+  opacity: 0;
+}
+
+.lb-panel {
+  width: min(880px, 100%);
+  max-height: 92vh;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  color: #faf5ee;
+  animation: lbZoomIn 0.45s cubic-bezier(0.16, 1, 0.3, 1) both;
+  transition:
+    opacity 0.28s ease,
+    transform 0.28s ease;
+}
+
+.lb-closing .lb-panel {
+  opacity: 0;
+  transform: scale(0.95) translateY(12px);
+}
+
+.lb-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.lb-close {
+  background: rgba(250, 245, 238, 0.12);
+  border: none;
+  color: #faf5ee;
+  width: 42px;
+  height: 42px;
+  border-radius: 999px;
+  font-size: 24px;
+  line-height: 1;
+  cursor: pointer;
+  transition:
+    background 0.25s ease,
+    transform 0.25s ease;
+}
+
+.lb-close:hover {
+  background: #c4451c;
+  transform: rotate(90deg);
+}
+
+.lb-stage {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 0;
+  flex: 1;
+}
+
+.lb-img {
+  max-width: 100%;
+  max-height: 62vh;
+  border-radius: 18px;
+  box-shadow: 0 40px 90px rgba(0, 0, 0, 0.5);
+  animation: lbImgIn 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
+  object-fit: contain;
+}
+
+.lb-arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 2;
+  background: rgba(250, 245, 238, 0.12);
+  border: none;
+  color: #faf5ee;
+  width: 46px;
+  height: 46px;
+  border-radius: 999px;
+  font-size: 19px;
+  cursor: pointer;
+  transition:
+    background 0.25s ease,
+    transform 0.25s ease;
+  backdrop-filter: blur(6px);
+}
+
+.lb-arrow:first-of-type {
+  left: 12px;
+}
+
+.lb-arrow:last-of-type {
+  right: 12px;
+}
+
+.lb-arrow:hover {
+  background: #c4451c;
+  transform: translateY(-50%) scale(1.08);
+}
+
+.lb-thumbs {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  overflow-x: auto;
+  padding: 4px 2px;
+}
+
+.lb-thumb {
+  flex: 0 0 auto;
+  width: 62px;
+  height: 78px;
+  padding: 0;
+  border: 2px solid transparent;
+  border-radius: 10px;
+  overflow: hidden;
+  cursor: pointer;
+  background: none;
+  opacity: 0.55;
+  transition:
+    opacity 0.25s ease,
+    transform 0.25s ease,
+    border-color 0.25s ease;
+}
+
+.lb-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.lb-thumb:hover {
+  opacity: 0.85;
+  transform: translateY(-2px);
+}
+
+.lb-thumb-active {
+  opacity: 1;
+  border-color: #e8906b;
+}

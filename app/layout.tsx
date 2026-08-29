@@ -18,7 +18,7 @@ const archivo = Archivo({
 export const metadata: Metadata = {
   title: "Rocío Romero — Content Creator & UGC",
   description:
-    "Videos y fotos con estética natural que no parecen publicidad. Content creator y UGC en Texas, USA.",
+    "Videos y fotos con estética natural que no parecen publicidad. Content creator y UGC: moda, lifestyle y mucha creatividad.",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
