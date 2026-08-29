@@ -3,6 +3,7 @@
 import { useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import CategoryCard from "@/components/admin/CategoryCard";
+import ChangePasswordModal from "@/components/admin/ChangePasswordModal";
 import CropStep from "@/components/admin/CropStep";
 import ImagePicker from "@/components/admin/ImagePicker";
 import UploadButton from "@/components/admin/UploadButton";
@@ -10,6 +11,7 @@ import type { StoredData } from "@/lib/content-store";
 import {
   DEFAULT_FOCAL,
   croppedPhoto,
+  focalStyle,
   type CroppedPhoto,
   type FocalPoint,
   type GaleriaItem,
@@ -44,6 +46,7 @@ export default function AdminDashboard({ initialData }: { initialData: StoredDat
   const [cropTarget, setCropTarget] = useState<CropTarget | null>(null);
   const [status, setStatus] = useState<Status>({ type: "idle" });
   const [newCategoryTag, setNewCategoryTag] = useState("");
+  const [changingPassword, setChangingPassword] = useState(false);
 
   const slots = useMemo(() => buildSlots(), []);
 
@@ -191,6 +194,9 @@ export default function AdminDashboard({ initialData }: { initialData: StoredDat
           <a href="/" target="_blank" rel="noopener noreferrer" className="adm-btn adm-btn-ghost">
             Ver landing ↗
           </a>
+          <button className="adm-btn adm-btn-ghost" onClick={() => setChangingPassword(true)}>
+            Cambiar contraseña
+          </button>
           <button onClick={logout} className="adm-btn adm-btn-outline">
             Cerrar sesión
           </button>
@@ -216,7 +222,7 @@ export default function AdminDashboard({ initialData }: { initialData: StoredDat
                         src={photo.url}
                         alt={slot.label}
                         className="adm-slot-img"
-                        style={{ objectPosition: `${photo.focal.x}% ${photo.focal.y}%` }}
+                        style={focalStyle(photo.focal)}
                       />
                       <div className="adm-slot-body">
                         <div className="adm-slot-label">{slot.label}</div>
@@ -366,6 +372,8 @@ export default function AdminDashboard({ initialData }: { initialData: StoredDat
           onClose={() => setCropTarget(null)}
         />
       )}
+
+      {changingPassword && <ChangePasswordModal onClose={() => setChangingPassword(false)} />}
     </div>
   );
 }

@@ -1,5 +1,6 @@
+import CroppedImage from "@/components/CroppedImage";
 import PortfolioGallery from "@/components/PortfolioGallery";
-import { CROP_ASPECT, focalCss, type SiteContent } from "@/lib/content";
+import type { SiteContent } from "@/lib/content";
 
 const MARQUEE_TEXT =
   "UGC · Moda · Lifestyle · Beauty · Unboxings · Reviews · Videos para TikTok e Instagram · Fotos de producto · ";
@@ -119,34 +120,20 @@ export default function Landing({ content }: { content: SiteContent }) {
             alignItems: "start",
           }}
         >
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src={content.hero.image1.url}
+          <CroppedImage
+            photo={content.hero.image1}
             alt="Rocío selfie"
             style={{
               width: "100%",
-              aspectRatio: CROP_ASPECT,
-              objectFit: "cover",
-              objectPosition: focalCss(content.hero.image1.focal),
               borderRadius: 16,
-              display: "block",
               marginTop: 40,
               boxShadow: "0 20px 40px rgba(34,27,20,0.18)",
             }}
           />
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src={content.hero.image2.url}
+          <CroppedImage
+            photo={content.hero.image2}
             alt="Rocío en la ciudad"
-            style={{
-              width: "100%",
-              aspectRatio: CROP_ASPECT,
-              objectFit: "cover",
-              objectPosition: focalCss(content.hero.image2.focal),
-              borderRadius: 16,
-              display: "block",
-              boxShadow: "0 20px 40px rgba(34,27,20,0.18)",
-            }}
+            style={{ width: "100%", borderRadius: 16, boxShadow: "0 20px 40px rgba(34,27,20,0.18)" }}
           />
         </div>
       </section>
@@ -181,19 +168,10 @@ export default function Landing({ content }: { content: SiteContent }) {
           alignItems: "center",
         }}
       >
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          src={content.sobreMi.image.url}
+        <CroppedImage
+          photo={content.sobreMi.image}
           alt="Rocío"
-          style={{
-            width: "100%",
-            aspectRatio: CROP_ASPECT,
-            objectFit: "cover",
-            objectPosition: focalCss(content.sobreMi.image.focal),
-            borderRadius: 16,
-            display: "block",
-            boxShadow: "0 20px 40px rgba(34,27,20,0.15)",
-          }}
+          style={{ width: "100%", borderRadius: 16, boxShadow: "0 20px 40px rgba(34,27,20,0.15)" }}
         />
         <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
           <div

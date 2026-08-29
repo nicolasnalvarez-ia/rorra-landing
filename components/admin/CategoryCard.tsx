@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { focalCss, type GaleriaItem } from "@/lib/content";
+import { focalStyle, type GaleriaItem } from "@/lib/content";
 
 export default function CategoryCard({
   category,
@@ -48,7 +48,7 @@ export default function CategoryCard({
         {category.photos.map((photo, i) => (
           <div className="adm-photo-tile adm-lib-tile" key={`${photo.url}-${i}`}>
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={photo.url} alt={`${category.tag} ${i + 1}`} style={{ objectPosition: focalCss(photo.focal) }} />
+            <img src={photo.url} alt={`${category.tag} ${i + 1}`} style={focalStyle(photo.focal)} />
             <button
               type="button"
               className="adm-focal-btn"

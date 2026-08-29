@@ -4,20 +4,29 @@ export type Servicio = {
   desc: string;
 };
 
-/** Crop focal point as percentages (0-100) from the top-left, used with CSS object-position. */
-export type FocalPoint = { x: number; y: number };
+/**
+ * Crop position as percentages (0-100) from the top-left, plus how far
+ * zoomed in the crop window is (1 = the loosest crop that still fills the
+ * target aspect ratio; higher = a smaller, tighter window on the photo).
+ */
+export type FocalPoint = { x: number; y: number; zoom: number };
 
-export const DEFAULT_FOCAL: FocalPoint = { x: 50, y: 50 };
+export const DEFAULT_FOCAL: FocalPoint = { x: 50, y: 50, zoom: 1 };
+export const MAX_ZOOM = 3;
 
-export function focalCss(focal: FocalPoint): string {
-  return `${focal.x}% ${focal.y}%`;
+/** Inline style for a cropped <img> — pairs with object-fit: cover on the same element. */
+export function focalStyle(focal: FocalPoint): { objectPosition: string; transform?: string; transformOrigin?: string } {
+  const position = `${focal.x}% ${focal.y}%`;
+  if (focal.zoom === 1) return { objectPosition: position };
+  return { objectPosition: position, transform: `scale(${focal.zoom})`, transformOrigin: position };
 }
 
 /**
  * A photo placed somewhere it gets cropped (object-fit: cover). Every cropped
- * spot on the site uses the same 3:4 aspect ratio, and the focal point is
- * chosen per placement (not per photo) since the same photo can be used in
- * different spots.
+ * spot on the site uses the same 3:4 aspect ratio, and the crop is chosen per
+ * placement (not per photo) since the same photo can be used in different
+ * spots. The element showing it needs its own overflow: hidden ancestor,
+ * since zooming in scales the image past its own box.
  */
 export type CroppedPhoto = { url: string; focal: FocalPoint };
 

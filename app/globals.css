@@ -845,3 +845,24 @@ a:hover {
     inset 0 0 0 1px rgba(0, 0, 0, 0.25);
   pointer-events: none;
 }
+
+.adm-zoom-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 14px;
+}
+
+.adm-zoom-label {
+  font-size: 15px;
+  color: var(--adm-muted);
+  flex: 0 0 auto;
+  width: 16px;
+  text-align: center;
+}
+
+.adm-zoom-row input[type="range"] {
+  flex: 1;
+  accent-color: var(--adm-accent);
+  cursor: pointer;
+}

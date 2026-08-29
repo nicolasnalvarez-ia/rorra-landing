@@ -37,7 +37,11 @@ function normalizeCroppedPhoto(value: unknown, fallback: CroppedPhoto): CroppedP
   if (typeof value === "string") return { url: value, focal: DEFAULT_FOCAL };
   if (value && typeof value === "object" && "url" in value) {
     const v = value as Partial<CroppedPhoto>;
-    return { url: v.url || fallback.url, focal: v.focal ?? DEFAULT_FOCAL };
+    const focal = v.focal;
+    return {
+      url: v.url || fallback.url,
+      focal: focal ? { x: focal.x, y: focal.y, zoom: focal.zoom ?? 1 } : DEFAULT_FOCAL,
+    };
   }
   return fallback;
 }

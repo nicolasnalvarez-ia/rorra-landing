@@ -5,7 +5,7 @@ export async function POST(request: Request) {
   const body = await request.json().catch(() => null);
   const password = typeof body?.password === "string" ? body.password : "";
 
-  if (!password || !isValidPassword(password)) {
+  if (!password || !(await isValidPassword(password))) {
     return NextResponse.json({ error: "Contraseña incorrecta." }, { status: 401 });
   }
 

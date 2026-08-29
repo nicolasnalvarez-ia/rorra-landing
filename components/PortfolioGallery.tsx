@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { CROP_ASPECT, focalCss, type GaleriaItem } from "@/lib/content";
+import { CROP_ASPECT, focalStyle, type GaleriaItem } from "@/lib/content";
 
 export default function PortfolioGallery({ galeria }: { galeria: GaleriaItem[] }) {
   const [openItem, setOpenItem] = useState<GaleriaItem | null>(null);
@@ -69,8 +69,8 @@ export default function PortfolioGallery({ galeria }: { galeria: GaleriaItem[] }
                   width: "100%",
                   aspectRatio: CROP_ASPECT,
                   objectFit: "cover",
-                  objectPosition: focalCss(g.photos[0].focal),
                   display: "block",
+                  ...focalStyle(g.photos[0].focal),
                 }}
               />
               <span className="pf-card-hint">＋ ver más</span>
@@ -153,7 +153,7 @@ export default function PortfolioGallery({ galeria }: { galeria: GaleriaItem[] }
                   aria-label={`Foto ${i + 1}`}
                 >
                   {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={photo.url} alt="" style={{ objectPosition: focalCss(photo.focal) }} />
+                  <img src={photo.url} alt="" style={focalStyle(photo.focal)} />
                 </button>
               ))}
             </div>
