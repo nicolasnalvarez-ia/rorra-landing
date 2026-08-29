@@ -98,6 +98,8 @@ export const defaultContent: SiteContent = {
   ],
 };
 
-export async function getContent(): Promise<SiteContent> {
-  return defaultContent;
-}
+export type LibraryItem = {
+  id: string;
+  url: string;
+  label: string;
+};
