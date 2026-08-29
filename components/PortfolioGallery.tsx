@@ -108,7 +108,7 @@ export default function PortfolioGallery({ galeria }: { galeria: GaleriaItem[] }
                   style={{
                     fontFamily: "var(--font-instrument-serif), serif",
                     fontStyle: "italic",
-                    fontSize: 32,
+                    fontSize: "clamp(22px, 6vw, 32px)",
                     lineHeight: 1,
                   }}
                 >

@@ -13,20 +13,23 @@ export default function Landing({ content }: { content: SiteContent }) {
           display: "flex",
           alignItems: "center",
           justifyContent: "space-between",
-          padding: "24px 48px",
+          flexWrap: "wrap",
+          padding: "clamp(16px, 4vw, 24px) clamp(20px, 5vw, 48px)",
           maxWidth: 1280,
           margin: "0 auto",
+          gap: 12,
         }}
       >
         <div style={{ fontFamily: "var(--font-instrument-serif), serif", fontSize: 24 }}>Rocío Romero</div>
         <nav
           style={{
             display: "flex",
-            gap: 32,
-            fontSize: 13,
+            gap: "clamp(12px, 3.5vw, 32px)",
+            fontSize: "clamp(11px, 2.4vw, 13px)",
             fontWeight: 600,
             letterSpacing: "0.08em",
             textTransform: "uppercase",
+            flexWrap: "wrap",
           }}
         >
           <a href="#sobre-mi">Sobre mí</a>
@@ -40,13 +43,12 @@ export default function Landing({ content }: { content: SiteContent }) {
 
       {/* HERO */}
       <section
+        className="hero-grid"
         style={{
           maxWidth: 1280,
           margin: "0 auto",
-          padding: "48px 48px 88px",
+          padding: "clamp(28px, 6vw, 48px) clamp(20px, 5vw, 48px) clamp(48px, 10vw, 88px)",
           display: "grid",
-          gridTemplateColumns: "1.1fr 0.9fr",
-          gap: 64,
           alignItems: "center",
         }}
       >
@@ -70,9 +72,10 @@ export default function Landing({ content }: { content: SiteContent }) {
             style={{
               fontFamily: "var(--font-instrument-serif), serif",
               fontWeight: 400,
-              fontSize: 78,
-              lineHeight: 1.02,
+              fontSize: "clamp(38px, 8vw, 78px)",
+              lineHeight: 1.05,
               margin: 0,
+              textWrap: "balance",
             }}
           >
             Contenido que se siente <em style={{ color: "#C4451C" }}>real</em>, hecho para tu marca.
@@ -158,13 +161,12 @@ export default function Landing({ content }: { content: SiteContent }) {
       {/* SOBRE MI */}
       <section
         id="sobre-mi"
+        className="sobre-mi-grid"
         style={{
           maxWidth: 1280,
           margin: "0 auto",
-          padding: "96px 48px",
+          padding: "clamp(56px, 12vw, 96px) clamp(20px, 5vw, 48px)",
           display: "grid",
-          gridTemplateColumns: "0.8fr 1.2fr",
-          gap: 72,
           alignItems: "center",
         }}
       >
@@ -189,9 +191,10 @@ export default function Landing({ content }: { content: SiteContent }) {
             style={{
               fontFamily: "var(--font-instrument-serif), serif",
               fontWeight: 400,
-              fontSize: 48,
+              fontSize: "clamp(30px, 6vw, 48px)",
               lineHeight: 1.08,
               margin: 0,
+              textWrap: "balance",
             }}
           >
             Marketing, moda y una cámara siempre a mano.
@@ -228,7 +231,7 @@ export default function Landing({ content }: { content: SiteContent }) {
           style={{
             maxWidth: 1280,
             margin: "0 auto",
-            padding: "96px 48px",
+            padding: "clamp(56px, 12vw, 96px) clamp(20px, 5vw, 48px)",
             display: "flex",
             flexDirection: "column",
             gap: 48,
@@ -260,9 +263,10 @@ export default function Landing({ content }: { content: SiteContent }) {
                 style={{
                   fontFamily: "var(--font-instrument-serif), serif",
                   fontWeight: 400,
-                  fontSize: 48,
+                  fontSize: "clamp(30px, 6vw, 48px)",
                   lineHeight: 1.08,
                   margin: 0,
+                  textWrap: "balance",
                 }}
               >
                 Qué puedo hacer por tu marca
@@ -308,7 +312,7 @@ export default function Landing({ content }: { content: SiteContent }) {
         style={{
           maxWidth: 1280,
           margin: "0 auto",
-          padding: "96px 48px",
+          padding: "clamp(56px, 12vw, 96px) clamp(20px, 5vw, 48px)",
           display: "flex",
           flexDirection: "column",
           gap: 48,
@@ -327,7 +331,14 @@ export default function Landing({ content }: { content: SiteContent }) {
           >
             Portfolio
           </div>
-          <h2 style={{ fontFamily: "var(--font-instrument-serif), serif", fontWeight: 400, fontSize: 48, margin: 0 }}>
+          <h2
+            style={{
+              fontFamily: "var(--font-instrument-serif), serif",
+              fontWeight: 400,
+              fontSize: "clamp(30px, 6vw, 48px)",
+              margin: 0,
+            }}
+          >
             Un poco de lo que hago
           </h2>
         </div>
@@ -360,7 +371,7 @@ export default function Landing({ content }: { content: SiteContent }) {
           style={{
             maxWidth: 900,
             margin: "0 auto",
-            padding: "110px 48px",
+            padding: "clamp(64px, 14vw, 110px) clamp(20px, 5vw, 48px) clamp(40px, 8vw, 60px)",
             display: "flex",
             flexDirection: "column",
             alignItems: "center",
@@ -383,9 +394,10 @@ export default function Landing({ content }: { content: SiteContent }) {
             style={{
               fontFamily: "var(--font-instrument-serif), serif",
               fontWeight: 400,
-              fontSize: 60,
+              fontSize: "clamp(34px, 9vw, 60px)",
               lineHeight: 1.05,
               margin: 0,
+              textWrap: "balance",
             }}
           >
             ¿Hacemos algo juntas? <em style={{ color: "#E8906B" }}>Escribime.</em>
@@ -424,7 +436,7 @@ export default function Landing({ content }: { content: SiteContent }) {
         <div
           style={{
             borderTop: "1px solid #3A322A",
-            padding: "24px 48px",
+            padding: "24px clamp(20px, 5vw, 48px)",
             display: "flex",
             justifyContent: "space-between",
             maxWidth: 1280,
