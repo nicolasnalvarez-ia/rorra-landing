@@ -1,45 +1,29 @@
-"use client";
-
-import CustomCursor from "@/components/CustomCursor";
-import PortfolioStrip from "@/components/PortfolioStrip";
-import { useReveal } from "@/components/useReveal";
 import type { SiteContent } from "@/lib/content";
 
 const MARQUEE_TEXT =
-  " UGC ✳ Moda ✳ Lifestyle ✳ Beauty ✳ Unboxings ✳ Reviews ✳ TikTok e Instagram ✳ Fotos de producto ✳";
+  "UGC · Moda · Lifestyle · Beauty · Unboxings · Reviews · Videos para TikTok e Instagram · Fotos de producto · ";
 
 export default function Landing({ content }: { content: SiteContent }) {
-  useReveal();
-
   return (
-    <div style={{ minHeight: "100vh", background: "#F7F0E6", overflowX: "hidden" }}>
-      <CustomCursor />
-
+    <div style={{ minHeight: "100vh", background: "#FAF5EE" }}>
       <header
         style={{
           display: "flex",
           alignItems: "center",
           justifyContent: "space-between",
-          padding: "26px 56px",
-          position: "sticky",
-          top: 0,
-          zIndex: 100,
-          background: "rgba(247,240,230,0.85)",
-          backdropFilter: "blur(12px)",
-          borderBottom: "1px solid rgba(30,24,18,0.08)",
+          padding: "24px 48px",
+          maxWidth: 1280,
+          margin: "0 auto",
         }}
       >
-        <div style={{ fontFamily: "var(--font-instrument-serif), serif", fontSize: 24 }}>
-          Rocío Romero
-          <span style={{ color: "#C4451C" }}>.</span>
-        </div>
+        <div style={{ fontFamily: "var(--font-instrument-serif), serif", fontSize: 24 }}>Rocío Romero</div>
         <nav
           style={{
             display: "flex",
-            gap: 34,
+            gap: 32,
             fontSize: 13,
-            fontWeight: 700,
-            letterSpacing: "0.1em",
+            fontWeight: 600,
+            letterSpacing: "0.08em",
             textTransform: "uppercase",
           }}
         >
@@ -47,7 +31,7 @@ export default function Landing({ content }: { content: SiteContent }) {
           <a href="#servicios">Servicios</a>
           <a href="#portfolio">Portfolio</a>
           <a href="#contacto" style={{ color: "#C4451C" }}>
-            Contacto ↗
+            Contacto
           </a>
         </nav>
       </header>
@@ -55,242 +39,125 @@ export default function Landing({ content }: { content: SiteContent }) {
       {/* HERO */}
       <section
         style={{
-          position: "relative",
-          maxWidth: 1340,
+          maxWidth: 1280,
           margin: "0 auto",
-          padding: "90px 56px 130px",
-          minHeight: "72vh",
+          padding: "48px 48px 88px",
           display: "grid",
-          gridTemplateColumns: "minmax(0, 1.4fr) minmax(300px, 1fr)",
-          gap: 40,
+          gridTemplateColumns: "1.1fr 0.9fr",
+          gap: 64,
+          alignItems: "center",
         }}
       >
-        <div style={{ position: "relative", zIndex: 2, minWidth: 0 }}>
+        <div style={{ display: "flex", flexDirection: "column", gap: 26 }}>
           <div
             style={{
-              fontSize: 14,
-              fontWeight: 700,
-              letterSpacing: "0.16em",
-              textTransform: "uppercase",
-              color: "#C4451C",
               display: "flex",
               alignItems: "center",
               gap: 12,
+              fontSize: 13,
+              fontWeight: 600,
+              letterSpacing: "0.14em",
+              textTransform: "uppercase",
+              color: "#C4451C",
             }}
           >
-            <span style={{ width: 44, height: 2, background: "#C4451C", display: "inline-block" }} />
+            <span style={{ width: 36, height: 2, background: "#C4451C", display: "inline-block" }} />
             {content.hero.badgeText}
           </div>
           <h1
             style={{
               fontFamily: "var(--font-instrument-serif), serif",
               fontWeight: 400,
-              margin: "28px 0 0",
-              fontSize: "clamp(54px, 7vw, 108px)",
-              lineHeight: 0.98,
-              letterSpacing: "-0.01em",
-              position: "relative",
-              zIndex: 2,
+              fontSize: 78,
+              lineHeight: 1.02,
+              margin: 0,
             }}
           >
-            Contenido
-            <br />
-            <span style={{ display: "inline-flex", alignItems: "center", gap: 24 }}>
-              <em style={{ color: "#C4451C" }}>real</em>
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src={content.hero.heroImage}
-                alt="Rocío"
-                style={{
-                  height: "0.85em",
-                  width: "1.7em",
-                  objectFit: "cover",
-                  borderRadius: 999,
-                  boxShadow: "0 10px 30px rgba(30,24,18,0.25)",
-                }}
-              />
-              <span style={{ WebkitTextStroke: "1.5px #1E1812", color: "transparent" }}>que</span>
-            </span>
-            <br />
-            conecta y vende.
+            Contenido que se siente <em style={{ color: "#C4451C" }}>real</em>, hecho para tu marca.
           </h1>
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: 40,
-              marginTop: 44,
-              position: "relative",
-              zIndex: 2,
-              flexWrap: "wrap",
-            }}
-          >
+          <p style={{ fontSize: 18, lineHeight: 1.6, color: "#5C5248", margin: 0, maxWidth: "46ch" }}>
+            Soy Rocío — creo videos y fotos con estética natural que conectan con la gente y venden sin
+            parecer publicidad. Moda, lifestyle y mucha creatividad.
+          </p>
+          <div style={{ display: "flex", gap: 16, alignItems: "center", flexWrap: "wrap" }}>
             <a
               href="#contacto"
               className="btn-dark"
-              style={{
-                padding: "18px 36px",
-                borderRadius: 999,
-                fontSize: 15,
-                fontWeight: 700,
-                display: "inline-flex",
-                alignItems: "center",
-                gap: 10,
-              }}
+              style={{ padding: "16px 32px", borderRadius: 999, fontSize: 15, fontWeight: 600 }}
             >
-              Trabajemos juntas <span style={{ fontSize: 18 }}>→</span>
+              Trabajemos juntas
             </a>
-            <p
-              style={{
-                fontSize: 16,
-                lineHeight: 1.55,
-                color: "#6B5F52",
-                maxWidth: "34ch",
-                margin: 0,
-              }}
+            <a
+              href="#portfolio"
+              style={{ padding: "16px 8px", fontSize: 15, fontWeight: 600, borderBottom: "2px solid #221B14" }}
             >
-              Videos y fotos con estética natural que no parecen publicidad — parecen una amiga
-              recomendando.
-            </p>
+              Ver portfolio ↓
+            </a>
+          </div>
+          <div style={{ display: "flex", gap: 40, paddingTop: 12, flexWrap: "wrap" }}>
+            <div>
+              <div style={{ fontFamily: "var(--font-instrument-serif), serif", fontSize: 34 }}>78K</div>
+              <div style={{ fontSize: 13, color: "#5C5248", letterSpacing: "0.04em" }}>en TikTok</div>
+            </div>
+            <div>
+              <div style={{ fontFamily: "var(--font-instrument-serif), serif", fontSize: 34 }}>+80</div>
+              <div style={{ fontSize: 13, color: "#5C5248", letterSpacing: "0.04em" }}>videos creados</div>
+            </div>
+            <div>
+              <div style={{ fontFamily: "var(--font-instrument-serif), serif", fontSize: 34 }}>ES/EN</div>
+              <div style={{ fontSize: 13, color: "#5C5248", letterSpacing: "0.04em" }}>contenido bilingüe</div>
+            </div>
           </div>
         </div>
-
-        {/* floating polaroids column */}
-        <div style={{ position: "relative", minHeight: 480 }}>
-          <div
-            data-parallax="30"
+        <div
+          style={{
+            position: "relative",
+            display: "grid",
+            gridTemplateColumns: "1fr 1fr",
+            gap: 16,
+            alignItems: "start",
+          }}
+        >
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={content.hero.image1}
+            alt="Rocío selfie"
             style={{
-              position: "absolute",
-              right: 0,
-              top: 0,
-              width: 220,
-              background: "#fff",
-              padding: "10px 10px 34px",
-              boxShadow: "0 24px 50px rgba(30,24,18,0.22)",
-              animation: "floaty 7s ease-in-out infinite",
-              zIndex: 1,
+              width: "100%",
+              borderRadius: 16,
+              display: "block",
+              marginTop: 40,
+              boxShadow: "0 20px 40px rgba(34,27,20,0.18)",
             }}
-          >
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src={content.hero.polaroid1.src}
-              alt="summer"
-              style={{ width: "100%", display: "block" }}
-            />
-            <div
-              style={{
-                fontFamily: "var(--font-caveat), cursive",
-                fontSize: 21,
-                textAlign: "center",
-                marginTop: 8,
-                color: "#1E1812",
-              }}
-            >
-              {content.hero.polaroid1.caption}
-            </div>
-          </div>
-          <div
-            data-parallax="-20"
+          />
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={content.hero.image2}
+            alt="Rocío en la ciudad"
             style={{
-              position: "absolute",
-              right: 170,
-              bottom: 30,
-              width: 185,
-              background: "#fff",
-              padding: "9px 9px 30px",
-              boxShadow: "0 24px 50px rgba(30,24,18,0.22)",
-              animation: "floaty2 8s ease-in-out infinite",
-              zIndex: 3,
+              width: "100%",
+              borderRadius: 16,
+              display: "block",
+              boxShadow: "0 20px 40px rgba(34,27,20,0.18)",
             }}
-          >
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src={content.hero.polaroid2.src}
-              alt="selfie"
-              style={{ width: "100%", display: "block" }}
-            />
-            <div
-              style={{
-                fontFamily: "var(--font-caveat), cursive",
-                fontSize: 20,
-                textAlign: "center",
-                marginTop: 7,
-              }}
-            >
-              {content.hero.polaroid2.caption}
-            </div>
-          </div>
-          {/* rotating badge */}
-          <div style={{ position: "absolute", right: 20, bottom: 0, width: 120, height: 120, zIndex: 4 }}>
-            <svg
-              viewBox="0 0 120 120"
-              style={{ width: "100%", height: "100%", animation: "spin 14s linear infinite" }}
-            >
-              <defs>
-                <path id="circ" d="M 60,60 m -44,0 a 44,44 0 1,1 88,0 a 44,44 0 1,1 -88,0" />
-              </defs>
-              <text
-                style={{
-                  fontFamily: "Archivo, sans-serif",
-                  fontSize: 12.5,
-                  fontWeight: 700,
-                  letterSpacing: "0.22em",
-                  textTransform: "uppercase",
-                  fill: "#1E1812",
-                }}
-              >
-                <textPath href="#circ">disponible para colabs · ugc · </textPath>
-              </text>
-            </svg>
-            <div
-              style={{
-                position: "absolute",
-                inset: 0,
-                display: "grid",
-                placeItems: "center",
-                fontSize: 26,
-                color: "#C4451C",
-              }}
-            >
-              ✳
-            </div>
-          </div>
+          />
         </div>
       </section>
 
       {/* marquee */}
-      <div
-        style={{
-          background: "#1E1812",
-          color: "#F7F0E6",
-          overflow: "hidden",
-          padding: "20px 0",
-          whiteSpace: "nowrap",
-          transform: "rotate(-1.2deg) scale(1.02)",
-          boxShadow: "0 10px 30px rgba(30,24,18,0.2)",
-        }}
-      >
-        <div style={{ display: "inline-flex", gap: 0, animation: "marquee 20s linear infinite" }}>
-          <span
-            style={{
-              fontFamily: "var(--font-instrument-serif), serif",
-              fontSize: 26,
-              fontStyle: "italic",
-              paddingRight: 12,
-            }}
-          >
-            {MARQUEE_TEXT}
-          </span>
-          <span
-            style={{
-              fontFamily: "var(--font-instrument-serif), serif",
-              fontSize: 26,
-              fontStyle: "italic",
-              paddingRight: 12,
-            }}
-          >
-            {MARQUEE_TEXT}
-          </span>
+      <div style={{ background: "#221B14", color: "#FAF5EE", overflow: "hidden", padding: "18px 0", whiteSpace: "nowrap" }}>
+        <div
+          style={{
+            display: "inline-flex",
+            gap: 48,
+            animation: "marquee 22s linear infinite",
+            fontFamily: "var(--font-instrument-serif), serif",
+            fontSize: 22,
+            fontStyle: "italic",
+          }}
+        >
+          <span>{MARQUEE_TEXT}</span>
+          <span>{MARQUEE_TEXT}</span>
         </div>
       </div>
 
@@ -298,62 +165,32 @@ export default function Landing({ content }: { content: SiteContent }) {
       <section
         id="sobre-mi"
         style={{
-          maxWidth: 1340,
+          maxWidth: 1280,
           margin: "0 auto",
-          padding: "130px 56px",
+          padding: "96px 48px",
           display: "grid",
-          gridTemplateColumns: "0.85fr 1.15fr",
-          gap: 90,
+          gridTemplateColumns: "0.8fr 1.2fr",
+          gap: 72,
           alignItems: "center",
         }}
       >
-        <div data-reveal style={{ position: "relative" }}>
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src={content.sobreMi.image}
-            alt="Rocío"
-            style={{
-              width: "100%",
-              borderRadius: 4,
-              display: "block",
-              boxShadow: "0 30px 60px rgba(30,24,18,0.22)",
-              transform: "rotate(-2deg)",
-            }}
-          />
-          <div
-            style={{
-              position: "absolute",
-              top: -18,
-              left: "50%",
-              transform: "translateX(-50%) rotate(3deg)",
-              background: "rgba(242,201,184,0.85)",
-              width: 120,
-              height: 34,
-            }}
-          />
-          <div
-            style={{
-              position: "absolute",
-              bottom: -20,
-              right: -14,
-              background: "#C4451C",
-              color: "#F7F0E6",
-              fontFamily: "var(--font-caveat), cursive",
-              fontSize: 24,
-              padding: "10px 22px",
-              borderRadius: 999,
-              transform: "rotate(-4deg)",
-            }}
-          >
-            {content.sobreMi.badge}
-          </div>
-        </div>
-        <div data-reveal style={{ display: "flex", flexDirection: "column", gap: 22 }}>
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src={content.sobreMi.image}
+          alt="Rocío"
+          style={{
+            width: "100%",
+            borderRadius: 16,
+            display: "block",
+            boxShadow: "0 20px 40px rgba(34,27,20,0.15)",
+          }}
+        />
+        <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
           <div
             style={{
               fontSize: 13,
-              fontWeight: 700,
-              letterSpacing: "0.16em",
+              fontWeight: 600,
+              letterSpacing: "0.14em",
               textTransform: "uppercase",
               color: "#C4451C",
             }}
@@ -364,161 +201,190 @@ export default function Landing({ content }: { content: SiteContent }) {
             style={{
               fontFamily: "var(--font-instrument-serif), serif",
               fontWeight: 400,
-              fontSize: 56,
-              lineHeight: 1.05,
+              fontSize: 48,
+              lineHeight: 1.08,
               margin: 0,
             }}
           >
-            Marketing, moda y una cámara <em style={{ color: "#C4451C" }}>siempre</em> a mano.
+            Marketing, moda y una cámara siempre a mano.
           </h2>
-          <p style={{ fontSize: 17, lineHeight: 1.75, color: "#6B5F52", margin: 0 }}>
-            Hago contenido desde antes de que fuera trabajo: probando productos, contando
-            historias y mostrando la vida como es. Las marcas me buscan porque mi contenido no
-            parece un aviso.
+          <p style={{ fontSize: 17, lineHeight: 1.7, color: "#5C5248", margin: 0 }}>
+            Argentina viviendo en Texas. Hago contenido desde antes de que fuera trabajo: probando
+            productos, contando historias y mostrando la vida como es. Las marcas me buscan porque mi
+            contenido no parece un aviso — parece una amiga recomendándote algo que le encantó.
           </p>
-          <p style={{ fontSize: 17, lineHeight: 1.75, color: "#6B5F52", margin: 0 }}>
+          <p style={{ fontSize: 17, lineHeight: 1.7, color: "#5C5248", margin: 0 }}>
             Grabo, edito y entrego listo para publicar. Español, inglés o los dos.
           </p>
-          <div style={{ display: "flex", gap: 44, paddingTop: 8, flexWrap: "wrap" }}>
-            <div>
-              <div style={{ fontFamily: "var(--font-instrument-serif), serif", fontSize: 40 }}>
-                78K
-              </div>
-              <div style={{ fontSize: 13, color: "#6B5F52" }}>en TikTok</div>
-            </div>
-            <div>
-              <div style={{ fontFamily: "var(--font-instrument-serif), serif", fontSize: 40 }}>
-                +80
-              </div>
-              <div style={{ fontSize: 13, color: "#6B5F52" }}>videos creados</div>
-            </div>
-            <div>
-              <div style={{ fontFamily: "var(--font-instrument-serif), serif", fontSize: 40 }}>
-                ES/EN
-              </div>
-              <div style={{ fontSize: 13, color: "#6B5F52" }}>bilingüe</div>
-            </div>
+          <div style={{ display: "flex", flexWrap: "wrap", gap: 10 }}>
+            {content.sobreMi.tags.map((tag) => (
+              <span
+                key={tag}
+                style={{
+                  border: "1px solid #D9CFC2",
+                  borderRadius: 999,
+                  padding: "8px 18px",
+                  fontSize: 14,
+                }}
+              >
+                {tag}
+              </span>
+            ))}
           </div>
         </div>
       </section>
 
       {/* SERVICIOS */}
-      <section id="servicios" style={{ maxWidth: 1340, margin: "0 auto", padding: "40px 56px 130px" }}>
-        <div data-reveal style={{ textAlign: "center", marginBottom: 60 }}>
+      <section id="servicios" style={{ background: "#F2E9DC" }}>
+        <div
+          style={{
+            maxWidth: 1280,
+            margin: "0 auto",
+            padding: "96px 48px",
+            display: "flex",
+            flexDirection: "column",
+            gap: 48,
+          }}
+        >
+          <div
+            style={{
+              display: "flex",
+              alignItems: "end",
+              justifyContent: "space-between",
+              gap: 24,
+              flexWrap: "wrap",
+            }}
+          >
+            <div>
+              <div
+                style={{
+                  fontSize: 13,
+                  fontWeight: 600,
+                  letterSpacing: "0.14em",
+                  textTransform: "uppercase",
+                  color: "#C4451C",
+                  marginBottom: 14,
+                }}
+              >
+                Servicios
+              </div>
+              <h2
+                style={{
+                  fontFamily: "var(--font-instrument-serif), serif",
+                  fontWeight: 400,
+                  fontSize: 48,
+                  lineHeight: 1.08,
+                  margin: 0,
+                }}
+              >
+                Qué puedo hacer por tu marca
+              </h2>
+            </div>
+            <p style={{ fontSize: 15, color: "#5C5248", maxWidth: "36ch", margin: 0 }}>
+              Todo el contenido se entrega editado, con derechos de uso para tus canales.
+            </p>
+          </div>
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))",
+              gap: 20,
+            }}
+          >
+            {content.servicios.map((s) => (
+              <div
+                key={s.num}
+                style={{
+                  background: "#FAF5EE",
+                  borderRadius: 16,
+                  padding: 32,
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: 14,
+                }}
+              >
+                <div style={{ fontFamily: "var(--font-instrument-serif), serif", fontSize: 40, color: "#C4451C" }}>
+                  {s.num}
+                </div>
+                <h3 style={{ fontSize: 21, margin: 0, fontWeight: 600 }}>{s.titulo}</h3>
+                <p style={{ fontSize: 15, lineHeight: 1.6, color: "#5C5248", margin: 0 }}>{s.desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* PORTFOLIO */}
+      <section
+        id="portfolio"
+        style={{
+          maxWidth: 1280,
+          margin: "0 auto",
+          padding: "96px 48px",
+          display: "flex",
+          flexDirection: "column",
+          gap: 48,
+        }}
+      >
+        <div style={{ textAlign: "center" }}>
           <div
             style={{
               fontSize: 13,
-              fontWeight: 700,
-              letterSpacing: "0.16em",
+              fontWeight: 600,
+              letterSpacing: "0.14em",
               textTransform: "uppercase",
               color: "#C4451C",
               marginBottom: 14,
             }}
           >
-            Servicios
+            Portfolio
           </div>
-          <h2 style={{ fontFamily: "var(--font-instrument-serif), serif", fontWeight: 400, fontSize: 56, margin: 0 }}>
-            Qué puedo hacer por tu marca
+          <h2 style={{ fontFamily: "var(--font-instrument-serif), serif", fontWeight: 400, fontSize: 48, margin: 0 }}>
+            Un poco de lo que hago
           </h2>
         </div>
-        <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
-          {content.servicios.map((s) => (
-            <div
-              key={s.num}
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(220px, 1fr))", gap: 16 }}>
+          {content.galeria.map((g) => (
+            <figure
+              key={g.id}
               style={{
-                position: "sticky",
-                top: s.top,
-                background: s.bg,
-                color: s.fg,
-                borderRadius: 22,
-                padding: "52px 60px",
-                display: "grid",
-                gridTemplateColumns: "80px 1fr auto",
-                gap: 40,
-                alignItems: "center",
-                boxShadow: "0 -12px 40px rgba(30,24,18,0.14)",
-                border: "1px solid rgba(30,24,18,0.08)",
-                minHeight: 160,
+                margin: 0,
+                position: "relative",
+                borderRadius: 14,
+                overflow: "hidden",
+                boxShadow: "0 12px 28px rgba(34,27,20,0.12)",
               }}
             >
-              <div style={{ fontFamily: "var(--font-instrument-serif), serif", fontSize: 58, color: "#C4451C" }}>
-                {s.num}
-              </div>
-              <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-                <h3 style={{ fontSize: 27, margin: 0, fontWeight: 700 }}>{s.titulo}</h3>
-                <p style={{ fontSize: 16, lineHeight: 1.6, margin: 0, maxWidth: "60ch", opacity: 0.75 }}>
-                  {s.desc}
-                </p>
-              </div>
-              <div
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={g.src}
+                alt={g.tag}
+                style={{ width: "100%", aspectRatio: "3/4", objectFit: "cover", display: "block" }}
+              />
+              <figcaption
                 style={{
-                  fontFamily: "var(--font-caveat), cursive",
-                  fontSize: 24,
-                  transform: "rotate(-4deg)",
-                  color: "#C4451C",
-                  whiteSpace: "nowrap",
+                  position: "absolute",
+                  left: 10,
+                  bottom: 10,
+                  background: "rgba(250,245,238,0.92)",
+                  borderRadius: 999,
+                  padding: "5px 14px",
+                  fontSize: 12,
+                  fontWeight: 600,
                 }}
               >
-                {s.nota}
-              </div>
-            </div>
+                {g.tag}
+              </figcaption>
+            </figure>
           ))}
         </div>
-      </section>
-
-      {/* PORTFOLIO */}
-      <section id="portfolio" style={{ background: "#1E1812", color: "#F7F0E6", padding: "120px 0", overflow: "hidden" }}>
-        <div
-          data-reveal
-          style={{
-            maxWidth: 1340,
-            margin: "0 auto 56px",
-            padding: "0 56px",
-            display: "flex",
-            alignItems: "end",
-            justifyContent: "space-between",
-            gap: 24,
-            flexWrap: "wrap",
-          }}
-        >
-          <div>
-            <div
-              style={{
-                fontSize: 13,
-                fontWeight: 700,
-                letterSpacing: "0.16em",
-                textTransform: "uppercase",
-                color: "#E8906B",
-                marginBottom: 14,
-              }}
-            >
-              Portfolio
-            </div>
-            <h2 style={{ fontFamily: "var(--font-instrument-serif), serif", fontWeight: 400, fontSize: 56, margin: 0 }}>
-              Un poco de lo que hago
-            </h2>
-          </div>
-          <div
-            style={{
-              fontFamily: "var(--font-caveat), cursive",
-              fontSize: 24,
-              color: "#E8906B",
-              transform: "rotate(-2deg)",
-            }}
-          >
-            arrastrá para ver más →
-          </div>
-        </div>
-
-        <PortfolioStrip galeria={content.galeria} />
-
-        <p style={{ textAlign: "center", fontSize: 15, color: "#C9BEB0", margin: "40px 0 0" }}>
+        <p style={{ textAlign: "center", fontSize: 15, color: "#5C5248", margin: 0 }}>
           Más en{" "}
           <a
             href="https://www.instagram.com/rorra.romero2/"
             target="_blank"
             rel="noopener noreferrer"
-            style={{ color: "#E8906B", fontWeight: 700, borderBottom: "1px solid #E8906B" }}
+            style={{ fontWeight: 600, borderBottom: "1px solid #221B14" }}
           >
             Instagram
           </a>{" "}
@@ -527,7 +393,7 @@ export default function Landing({ content }: { content: SiteContent }) {
             href="https://www.tiktok.com/@rorra.romero"
             target="_blank"
             rel="noopener noreferrer"
-            style={{ color: "#E8906B", fontWeight: 700, borderBottom: "1px solid #E8906B" }}
+            style={{ fontWeight: 600, borderBottom: "1px solid #221B14" }}
           >
             TikTok
           </a>
@@ -535,45 +401,49 @@ export default function Landing({ content }: { content: SiteContent }) {
       </section>
 
       {/* CONTACTO */}
-      <section
-        id="contacto"
-        style={{ position: "relative", padding: "150px 56px 60px", maxWidth: 1340, margin: "0 auto" }}
-      >
+      <section id="contacto" style={{ background: "#221B14", color: "#FAF5EE" }}>
         <div
-          data-reveal
-          style={{ textAlign: "center", display: "flex", flexDirection: "column", alignItems: "center", gap: 30 }}
+          style={{
+            maxWidth: 900,
+            margin: "0 auto",
+            padding: "110px 48px",
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            gap: 28,
+            textAlign: "center",
+          }}
         >
           <div
             style={{
-              fontFamily: "var(--font-caveat), cursive",
-              fontSize: 30,
-              color: "#C4451C",
-              transform: "rotate(-2deg)",
+              fontSize: 13,
+              fontWeight: 600,
+              letterSpacing: "0.14em",
+              textTransform: "uppercase",
+              color: "#E8906B",
             }}
           >
-            ¿te gustó lo que viste?
+            Contacto
           </div>
-          <a
-            href="mailto:hola@rocioromero.com"
-            className="contact-link"
+          <h2
             style={{
               fontFamily: "var(--font-instrument-serif), serif",
-              fontSize: "clamp(54px, 8vw, 116px)",
-              lineHeight: 1,
-              color: "#1E1812",
-              display: "inline-block",
+              fontWeight: 400,
+              fontSize: 60,
+              lineHeight: 1.05,
+              margin: 0,
             }}
           >
-            Escribime →
-          </a>
-          <p style={{ fontSize: 17, color: "#6B5F52", maxWidth: "46ch", margin: 0 }}>
+            ¿Hacemos algo juntas? <em style={{ color: "#E8906B" }}>Escribime.</em>
+          </h2>
+          <p style={{ fontSize: 17, lineHeight: 1.6, color: "#C9BEB0", margin: 0, maxWidth: "48ch" }}>
             Contame de tu marca y armamos contenido que la gente quiera ver. Respondo rápido.
           </p>
-          <div style={{ display: "flex", gap: 14, flexWrap: "wrap", justifyContent: "center" }}>
+          <div style={{ display: "flex", gap: 16, flexWrap: "wrap", justifyContent: "center" }}>
             <a
               href="mailto:hola@rocioromero.com"
-              className="btn-dark"
-              style={{ padding: "15px 30px", borderRadius: 999, fontSize: 14, fontWeight: 700 }}
+              className="btn-light"
+              style={{ padding: "16px 32px", borderRadius: 999, fontSize: 15, fontWeight: 600 }}
             >
               hola@rocioromero.com
             </a>
@@ -581,8 +451,8 @@ export default function Landing({ content }: { content: SiteContent }) {
               href="https://www.instagram.com/rorra.romero2/"
               target="_blank"
               rel="noopener noreferrer"
-              className="btn-outline"
-              style={{ padding: "15px 30px", borderRadius: 999, fontSize: 14, fontWeight: 700 }}
+              className="btn-outline-light"
+              style={{ padding: "16px 32px", borderRadius: 999, fontSize: 15, fontWeight: 600 }}
             >
               Instagram
             </a>
@@ -590,8 +460,8 @@ export default function Landing({ content }: { content: SiteContent }) {
               href="https://www.tiktok.com/@rorra.romero"
               target="_blank"
               rel="noopener noreferrer"
-              className="btn-outline"
-              style={{ padding: "15px 30px", borderRadius: 999, fontSize: 14, fontWeight: 700 }}
+              className="btn-outline-light"
+              style={{ padding: "16px 32px", borderRadius: 999, fontSize: 15, fontWeight: 600 }}
             >
               TikTok
             </a>
@@ -599,11 +469,12 @@ export default function Landing({ content }: { content: SiteContent }) {
         </div>
         <div
           style={{
-            borderTop: "1px solid rgba(30,24,18,0.12)",
-            marginTop: 90,
-            paddingTop: 24,
+            borderTop: "1px solid #3A322A",
+            padding: "24px 48px",
             display: "flex",
             justifyContent: "space-between",
+            maxWidth: 1280,
+            margin: "0 auto",
             fontSize: 13,
             color: "#8A7E70",
             flexWrap: "wrap",
@@ -611,7 +482,9 @@ export default function Landing({ content }: { content: SiteContent }) {
           }}
         >
           <span>© 2026 Rocío Romero</span>
-          <span style={{ fontFamily: "var(--font-caveat), cursive", fontSize: 19 }}>hecho con onda ✳</span>
+          <span style={{ fontFamily: "var(--font-instrument-serif), serif", fontStyle: "italic", fontSize: 15 }}>
+            contenido con onda ✳
+          </span>
         </div>
       </section>
     </div>
