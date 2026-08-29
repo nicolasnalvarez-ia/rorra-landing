@@ -2,31 +2,37 @@
 
 import { useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
+import CategoryCard from "@/components/admin/CategoryCard";
+import ImagePicker from "@/components/admin/ImagePicker";
+import UploadButton from "@/components/admin/UploadButton";
 import type { StoredData } from "@/lib/content-store";
-import type { LibraryItem, SiteContent } from "@/lib/content";
+import type { GaleriaItem, LibraryItem, SiteContent } from "@/lib/content";
 import { buildSlots } from "@/lib/slots";
 
 type Status = { type: "idle" | "saving" | "saved" | "error"; message?: string };
+type Picker = { type: "slot"; key: string } | { type: "category"; id: string } | null;
+
+function newId() {
+  return `g-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 7)}`;
+}
 
 export default function AdminDashboard({ initialData }: { initialData: StoredData }) {
   const router = useRouter();
   const [content, setContent] = useState<SiteContent>(initialData.content);
-  const [library, setLibrary] = useState<LibraryItem[]>(initialData.library);
-  const [pickerSlot, setPickerSlot] = useState<string | null>(null);
+  const [library, setLibraryState] = useState<LibraryItem[]>(initialData.library);
+  // Kept in sync with `library` but updates synchronously, so a picker's "upload
+  // then immediately select" flow can persist the freshly uploaded item instead
+  // of a stale pre-upload snapshot from the same event handler.
+  const libraryRef = useRef(initialData.library);
+  function setLibrary(next: LibraryItem[]) {
+    libraryRef.current = next;
+    setLibraryState(next);
+  }
+  const [picker, setPicker] = useState<Picker>(null);
   const [status, setStatus] = useState<Status>({ type: "idle" });
-  const [uploading, setUploading] = useState(false);
-  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [newCategoryTag, setNewCategoryTag] = useState("");
 
-  const slots = useMemo(() => buildSlots(content), [content]);
-  const sections = useMemo(() => {
-    const bySection = new Map<string, typeof slots>();
-    slots.forEach((s) => {
-      const arr = bySection.get(s.section) ?? [];
-      arr.push(s);
-      bySection.set(s.section, arr);
-    });
-    return Array.from(bySection.entries());
-  }, [slots]);
+  const slots = useMemo(() => buildSlots(), []);
 
   async function persist(nextContent: SiteContent, nextLibrary: LibraryItem[]) {
     setStatus({ type: "saving" });
@@ -37,42 +43,70 @@ export default function AdminDashboard({ initialData }: { initialData: StoredDat
         body: JSON.stringify({ content: nextContent, library: nextLibrary }),
       });
       if (!res.ok) throw new Error("save failed");
-      setStatus({ type: "saved", message: "Cambios guardados." });
+      setStatus({ type: "saved", message: "Cambios guardados" });
     } catch {
-      setStatus({ type: "error", message: "No se pudieron guardar los cambios." });
+      setStatus({ type: "error", message: "No se pudieron guardar los cambios" });
     }
   }
 
-  function assignImage(slotKey: string, url: string) {
+  function addToLibrary(item: LibraryItem) {
+    const prev = libraryRef.current;
+    setLibrary(prev.some((l) => l.url === item.url) ? prev : [item, ...prev]);
+  }
+
+  function assignSlot(slotKey: string, url: string) {
     const slot = slots.find((s) => s.key === slotKey);
     if (!slot) return;
     const next = slot.set(content, url);
     setContent(next);
-    setPickerSlot(null);
-    persist(next, library);
+    setPicker(null);
+    persist(next, libraryRef.current);
   }
 
-  async function onUpload(e: React.ChangeEvent<HTMLInputElement>) {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    setUploading(true);
-    setStatus({ type: "idle" });
-    try {
-      const formData = new FormData();
-      formData.append("file", file);
-      const res = await fetch("/api/admin/upload", { method: "POST", body: formData });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "upload failed");
-      const newItem: LibraryItem = { id: data.url, url: data.url, label: data.label };
-      const nextLibrary = [newItem, ...library];
-      setLibrary(nextLibrary);
-      await persist(content, nextLibrary);
-    } catch (err) {
-      setStatus({ type: "error", message: err instanceof Error ? err.message : "Error al subir la imagen." });
-    } finally {
-      setUploading(false);
-      if (fileInputRef.current) fileInputRef.current.value = "";
-    }
+  function updateGaleria(updater: (galeria: GaleriaItem[]) => GaleriaItem[]) {
+    const next = { ...content, galeria: updater(content.galeria) };
+    setContent(next);
+    persist(next, libraryRef.current);
+    return next;
+  }
+
+  function renameCategory(id: string, tag: string) {
+    updateGaleria((galeria) => galeria.map((g) => (g.id === id ? { ...g, tag } : g)));
+  }
+
+  function deleteCategory(id: string) {
+    updateGaleria((galeria) => galeria.filter((g) => g.id !== id));
+  }
+
+  function addCategory() {
+    const tag = newCategoryTag.trim();
+    if (!tag) return;
+    updateGaleria((galeria) => [...galeria, { id: newId(), tag, photos: [] }]);
+    setNewCategoryTag("");
+  }
+
+  function removePhoto(categoryId: string, index: number) {
+    updateGaleria((galeria) =>
+      galeria.map((g) => (g.id === categoryId ? { ...g, photos: g.photos.filter((_, i) => i !== index) } : g))
+    );
+  }
+
+  function addPhotoToCategory(categoryId: string, url: string) {
+    const next = {
+      ...content,
+      galeria: content.galeria.map((g) => (g.id === categoryId ? { ...g, photos: [...g.photos, url] } : g)),
+    };
+    setContent(next);
+    setPicker(null);
+    persist(next, libraryRef.current);
+  }
+
+  function onPickerUploaded(item: LibraryItem) {
+    addToLibrary(item);
+  }
+
+  function onError(message: string) {
+    setStatus({ type: "error", message });
   }
 
   async function logout() {
@@ -81,238 +115,153 @@ export default function AdminDashboard({ initialData }: { initialData: StoredDat
     router.refresh();
   }
 
+  const pickerCategory = picker?.type === "category" ? content.galeria.find((g) => g.id === picker.id) : null;
+  const pickerSlotDef = picker?.type === "slot" ? slots.find((s) => s.key === picker.key) : null;
+
   return (
-    <div style={{ minHeight: "100vh", background: "#F7F0E6", fontFamily: "Archivo, sans-serif", color: "#1E1812" }}>
-      <header
-        style={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-          padding: "20px 32px",
-          borderBottom: "1px solid rgba(30,24,18,0.1)",
-          position: "sticky",
-          top: 0,
-          background: "rgba(247,240,230,0.92)",
-          backdropFilter: "blur(10px)",
-          zIndex: 10,
-          flexWrap: "wrap",
-          gap: 12,
-        }}
-      >
+    <div className="adm">
+      <header className="adm-header">
         <div>
-          <div style={{ fontFamily: "Georgia, serif", fontSize: 22 }}>
+          <div className="adm-title">
             Panel de admin <span style={{ color: "#C4451C" }}>·</span> Rocío Romero
           </div>
-          <div style={{ fontSize: 13, color: "#6B5F52" }}>Elegí qué imagen aparece en cada parte de la landing.</div>
+          <div className="adm-subtitle">Elegí las imágenes y organizá las categorías del portfolio.</div>
         </div>
-        <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
           {status.type !== "idle" && (
-            <span
-              style={{
-                fontSize: 13,
-                color: status.type === "error" ? "#C4451C" : "#6B5F52",
-              }}
-            >
+            <span className="adm-status">
+              <span className={`adm-status-dot${status.type === "saving" ? " is-saving" : ""}${status.type === "error" ? " is-error" : ""}`} />
               {status.type === "saving" ? "Guardando…" : status.message}
             </span>
           )}
-          <a
-            href="/"
-            target="_blank"
-            rel="noopener noreferrer"
-            style={{
-              fontSize: 13,
-              fontWeight: 700,
-              textDecoration: "underline",
-              color: "#1E1812",
-            }}
-          >
+          <a href="/" target="_blank" rel="noopener noreferrer" className="adm-btn adm-btn-ghost">
             Ver landing ↗
           </a>
-          <button
-            onClick={logout}
-            style={{
-              border: "1.5px solid #1E1812",
-              background: "transparent",
-              borderRadius: 999,
-              padding: "9px 18px",
-              fontSize: 13,
-              fontWeight: 700,
-              cursor: "pointer",
-            }}
-          >
+          <button onClick={logout} className="adm-btn adm-btn-outline">
             Cerrar sesión
           </button>
         </div>
       </header>
 
-      <main style={{ maxWidth: 1100, margin: "0 auto", padding: "36px 32px 80px" }}>
-        <section
-          style={{
-            background: "#fff",
-            borderRadius: 16,
-            padding: "24px 28px",
-            marginBottom: 36,
-            boxShadow: "0 12px 30px rgba(30,24,18,0.08)",
-          }}
-        >
-          <div style={{ fontWeight: 700, fontSize: 15, marginBottom: 6 }}>Subir nueva imagen</div>
-          <p style={{ fontSize: 13, color: "#6B5F52", margin: "0 0 14px" }}>
-            Se agrega a tu biblioteca de fotos para poder usarla en cualquier parte de la landing. JPG, PNG,
-            WEBP o GIF, hasta 8MB.
-          </p>
-          <input
-            ref={fileInputRef}
-            type="file"
-            accept="image/png,image/jpeg,image/webp,image/gif"
-            onChange={onUpload}
-            disabled={uploading}
-          />
-          {uploading && <span style={{ marginLeft: 12, fontSize: 13, color: "#6B5F52" }}>Subiendo…</span>}
-        </section>
-
-        {sections.map(([section, sectionSlots]) => (
-          <section key={section} style={{ marginBottom: 40 }}>
-            <h2 style={{ fontSize: 20, fontWeight: 700, marginBottom: 16 }}>{section}</h2>
-            <div
-              style={{
-                display: "grid",
-                gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))",
-                gap: 20,
-              }}
-            >
-              {sectionSlots.map((slot) => (
-                <div
-                  key={slot.key}
-                  style={{
-                    background: "#fff",
-                    borderRadius: 14,
-                    overflow: "hidden",
-                    boxShadow: "0 8px 24px rgba(30,24,18,0.08)",
-                  }}
-                >
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
-                    src={slot.get(content)}
-                    alt={slot.label}
-                    style={{ width: "100%", aspectRatio: "4/3", objectFit: "cover", display: "block" }}
-                  />
-                  <div style={{ padding: "12px 14px" }}>
-                    <div style={{ fontSize: 13, marginBottom: 10, lineHeight: 1.4 }}>{slot.label}</div>
-                    <button
-                      onClick={() => setPickerSlot(slot.key)}
-                      style={{
-                        width: "100%",
-                        background: "#1E1812",
-                        color: "#F7F0E6",
-                        border: "none",
-                        borderRadius: 999,
-                        padding: "9px 12px",
-                        fontSize: 13,
-                        fontWeight: 700,
-                        cursor: "pointer",
-                      }}
-                    >
-                      Cambiar imagen
-                    </button>
-                  </div>
-                </div>
-              ))}
+      <main className="adm-main">
+        {/* HERO / SOBRE MI SLOTS */}
+        {["Hero", "Sobre mí"].map((section) => (
+          <div className="adm-section" key={section}>
+            <div className="adm-section-head">
+              <div className="adm-section-title">{section}</div>
             </div>
-          </section>
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))", gap: 18 }}>
+              {slots
+                .filter((s) => s.section === section)
+                .map((slot) => (
+                  <div key={slot.key} className="adm-slot-card">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src={slot.get(content)} alt={slot.label} className="adm-slot-img" />
+                    <div className="adm-slot-body">
+                      <div className="adm-slot-label">{slot.label}</div>
+                      <button
+                        className="adm-btn adm-btn-primary"
+                        onClick={() => setPicker({ type: "slot", key: slot.key })}
+                      >
+                        Cambiar imagen
+                      </button>
+                    </div>
+                  </div>
+                ))}
+            </div>
+          </div>
         ))}
+
+        {/* PORTFOLIO CATEGORIES */}
+        <div className="adm-section">
+          <div className="adm-section-head">
+            <div>
+              <div className="adm-section-title">Portfolio</div>
+              <p className="adm-section-desc">
+                Cada categoría aparece como una tarjeta en el portfolio. Podés agregar, renombrar o eliminar
+                categorías, y sumar o quitar fotos dentro de cada una.
+              </p>
+            </div>
+          </div>
+
+          <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+            {content.galeria.map((cat) => (
+              <CategoryCard
+                key={cat.id}
+                category={cat}
+                onRename={(tag) => renameCategory(cat.id, tag)}
+                onDelete={() => deleteCategory(cat.id)}
+                onRemovePhoto={(i) => removePhoto(cat.id, i)}
+                onAddPhoto={() => setPicker({ type: "category", id: cat.id })}
+              />
+            ))}
+
+            <div className="adm-new-cat">
+              <input
+                className="adm-input"
+                placeholder="Nombre de la nueva categoría (ej: viajes)"
+                value={newCategoryTag}
+                onChange={(e) => setNewCategoryTag(e.target.value)}
+                onKeyDown={(e) => e.key === "Enter" && addCategory()}
+                style={{ flex: 1, minWidth: 200 }}
+              />
+              <button className="adm-btn adm-btn-primary" onClick={addCategory} disabled={!newCategoryTag.trim()}>
+                ＋ Nueva categoría
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {/* PHOTO LIBRARY */}
+        <div className="adm-section">
+          <div className="adm-section-head">
+            <div>
+              <div className="adm-section-title">Biblioteca de fotos</div>
+              <p className="adm-section-desc">
+                Subí fotos nuevas acá para tenerlas disponibles en cualquier parte de la landing. JPG, PNG,
+                WEBP o GIF, hasta 8MB.
+              </p>
+            </div>
+            <UploadButton
+              label="＋ Subir foto"
+              className="adm-btn adm-btn-primary"
+              onUploaded={(item) => addToLibrary(item)}
+              onError={onError}
+            />
+          </div>
+          <div className="adm-cat-photos">
+            {library.map((item) => (
+              <div className="adm-photo-tile" key={item.id} title={item.label}>
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={item.url} alt={item.label} />
+              </div>
+            ))}
+          </div>
+        </div>
       </main>
 
-      {pickerSlot && (
+      {picker?.type === "slot" && pickerSlotDef && (
         <ImagePicker
+          title={`Elegí: ${pickerSlotDef.label}`}
           library={library}
-          currentUrl={slots.find((s) => s.key === pickerSlot)?.get(content) ?? ""}
-          onSelect={(url) => assignImage(pickerSlot, url)}
-          onClose={() => setPickerSlot(null)}
+          currentUrl={pickerSlotDef.get(content)}
+          onSelect={(url) => assignSlot(picker.key, url)}
+          onClose={() => setPicker(null)}
+          onUploaded={onPickerUploaded}
+          onError={onError}
         />
       )}
-    </div>
-  );
-}
 
-function ImagePicker({
-  library,
-  currentUrl,
-  onSelect,
-  onClose,
-}: {
-  library: LibraryItem[];
-  currentUrl: string;
-  onSelect: (url: string) => void;
-  onClose: () => void;
-}) {
-  return (
-    <div
-      onClick={onClose}
-      style={{
-        position: "fixed",
-        inset: 0,
-        background: "rgba(30,24,18,0.55)",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        zIndex: 100,
-        padding: 24,
-      }}
-    >
-      <div
-        onClick={(e) => e.stopPropagation()}
-        style={{
-          background: "#F7F0E6",
-          borderRadius: 18,
-          padding: 24,
-          maxWidth: 760,
-          width: "100%",
-          maxHeight: "80vh",
-          overflowY: "auto",
-        }}
-      >
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
-          <div style={{ fontWeight: 700, fontSize: 16 }}>Elegí una imagen</div>
-          <button
-            onClick={onClose}
-            style={{ background: "none", border: "none", fontSize: 20, cursor: "pointer", lineHeight: 1 }}
-            aria-label="Cerrar"
-          >
-            ×
-          </button>
-        </div>
-        <div
-          style={{
-            display: "grid",
-            gridTemplateColumns: "repeat(auto-fill, minmax(140px, 1fr))",
-            gap: 12,
-          }}
-        >
-          {library.map((item) => (
-            <button
-              key={item.id}
-              onClick={() => onSelect(item.url)}
-              style={{
-                padding: 0,
-                border: item.url === currentUrl ? "3px solid #C4451C" : "3px solid transparent",
-                borderRadius: 10,
-                overflow: "hidden",
-                cursor: "pointer",
-                background: "#fff",
-              }}
-              title={item.label}
-            >
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src={item.url}
-                alt={item.label}
-                style={{ width: "100%", aspectRatio: "1/1", objectFit: "cover", display: "block" }}
-              />
-            </button>
-          ))}
-        </div>
-      </div>
+      {picker?.type === "category" && pickerCategory && (
+        <ImagePicker
+          title={`Agregar foto a "${pickerCategory.tag}"`}
+          library={library}
+          onSelect={(url) => addPhotoToCategory(picker.id, url)}
+          onClose={() => setPicker(null)}
+          onUploaded={onPickerUploaded}
+          onError={onError}
+        />
+      )}
     </div>
   );
 }

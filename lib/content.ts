@@ -6,10 +6,9 @@ export type Servicio = {
 
 export type GaleriaItem = {
   id: string;
-  src: string;
   tag: string;
-  /** Additional photos of the same style, shown when the card is expanded. */
-  related: string[];
+  /** All photos in this category. photos[0] is the cover shown on the grid. */
+  photos: string[];
 };
 
 export type SiteContent = {
@@ -73,51 +72,53 @@ export const defaultContent: SiteContent = {
   galeria: [
     {
       id: "g1",
-      src: "/photos/vestido-noche.jpg",
       tag: "night out",
-      related: ["/photos/noche-espalda.jpg", "/photos/city-night.jpg"],
+      photos: ["/photos/vestido-noche.jpg", "/photos/noche-espalda.jpg", "/photos/city-night.jpg"],
     },
     {
       id: "g2",
-      src: "/photos/texas.jpg",
       tag: "travel",
-      related: ["/photos/city-night.jpg", "/photos/pergola.jpg"],
+      photos: ["/photos/texas.jpg", "/photos/city-night.jpg", "/photos/pergola.jpg"],
     },
     {
       id: "g3",
-      src: "/photos/mirror.jpg",
       tag: "fits",
-      related: ["/photos/camiseta-argentina.jpg", "/photos/zebra-selfie.jpg", "/photos/vestido-noche.jpg"],
+      photos: [
+        "/photos/mirror.jpg",
+        "/photos/camiseta-argentina.jpg",
+        "/photos/zebra-selfie.jpg",
+        "/photos/vestido-noche.jpg",
+      ],
     },
     {
       id: "g4",
-      src: "/photos/pool.jpg",
       tag: "summer",
-      related: ["/photos/bikini-rosa.jpg", "/photos/pergola.jpg"],
+      photos: ["/photos/pool.jpg", "/photos/bikini-rosa.jpg", "/photos/pergola.jpg"],
     },
     {
       id: "g5",
-      src: "/photos/camiseta-argentina.jpg",
       tag: "on camera",
-      related: ["/photos/zebra-selfie.jpg", "/photos/mirror.jpg"],
+      photos: ["/photos/camiseta-argentina.jpg", "/photos/zebra-selfie.jpg", "/photos/mirror.jpg"],
     },
     {
       id: "g6",
-      src: "/photos/ross.jpg",
       tag: "haul",
-      related: ["/photos/mirror.jpg", "/photos/camiseta-argentina.jpg"],
+      photos: ["/photos/ross.jpg", "/photos/mirror.jpg", "/photos/camiseta-argentina.jpg"],
     },
     {
       id: "g7",
-      src: "/photos/sushi.jpg",
       tag: "food",
-      related: ["/photos/city-night.jpg", "/photos/texas.jpg"],
+      photos: ["/photos/sushi.jpg", "/photos/city-night.jpg", "/photos/texas.jpg"],
     },
     {
       id: "g8",
-      src: "/photos/noche-espalda.jpg",
       tag: "glam",
-      related: ["/photos/vestido-noche.jpg", "/photos/zebra-selfie.jpg", "/photos/city-night.jpg"],
+      photos: [
+        "/photos/noche-espalda.jpg",
+        "/photos/vestido-noche.jpg",
+        "/photos/zebra-selfie.jpg",
+        "/photos/city-night.jpg",
+      ],
     },
   ],
 };

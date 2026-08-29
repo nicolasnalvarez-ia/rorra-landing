@@ -8,8 +8,9 @@ export type SlotDef = {
   set: (content: SiteContent, url: string) => SiteContent;
 };
 
-export function buildSlots(content: SiteContent): SlotDef[] {
-  const slots: SlotDef[] = [
+/** Single-image slots (hero, sobre mí). Portfolio categories have their own CRUD UI. */
+export function buildSlots(): SlotDef[] {
+  return [
     {
       key: "hero.image1",
       section: "Hero",
@@ -32,19 +33,4 @@ export function buildSlots(content: SiteContent): SlotDef[] {
       set: (c, url) => ({ ...c, sobreMi: { ...c.sobreMi, image: url } }),
     },
   ];
-
-  content.galeria.forEach((item, i) => {
-    slots.push({
-      key: `galeria.${item.id}`,
-      section: "Portfolio",
-      label: `Foto ${i + 1} — "${item.tag}"`,
-      get: (c) => c.galeria.find((g) => g.id === item.id)?.src ?? "",
-      set: (c, url) => ({
-        ...c,
-        galeria: c.galeria.map((g) => (g.id === item.id ? { ...g, src: url } : g)),
-      }),
-    });
-  });
-
-  return slots;
 }

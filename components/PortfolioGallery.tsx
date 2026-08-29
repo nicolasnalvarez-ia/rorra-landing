@@ -8,10 +8,7 @@ export default function PortfolioGallery({ galeria }: { galeria: GaleriaItem[] }
   const [index, setIndex] = useState(0);
   const [closing, setClosing] = useState(false);
 
-  const photos = useMemo(() => {
-    if (!openItem) return [];
-    return [openItem.src, ...openItem.related.filter((src) => src !== openItem.src)];
-  }, [openItem]);
+  const photos = useMemo(() => openItem?.photos ?? [], [openItem]);
 
   const open = (item: GaleriaItem) => {
     setIndex(0);
@@ -54,7 +51,7 @@ export default function PortfolioGallery({ galeria }: { galeria: GaleriaItem[] }
   return (
     <>
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(220px, 1fr))", gap: 16 }}>
-        {galeria.map((g) => (
+        {galeria.filter((g) => g.photos.length > 0).map((g) => (
           <button
             key={g.id}
             type="button"
@@ -64,7 +61,7 @@ export default function PortfolioGallery({ galeria }: { galeria: GaleriaItem[] }
           >
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
-              src={g.src}
+              src={g.photos[0]}
               alt={g.tag}
               style={{ width: "100%", aspectRatio: "3/4", objectFit: "cover", display: "block" }}
             />
@@ -125,7 +122,7 @@ export default function PortfolioGallery({ galeria }: { galeria: GaleriaItem[] }
                 </button>
               )}
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img key={photos[index]} src={photos[index]} alt={openItem.tag} className="lb-img" />
+              <img key={`${photos[index]}-${index}`} src={photos[index]} alt={openItem.tag} className="lb-img" />
               {photos.length > 1 && (
                 <button type="button" className="lb-arrow" onClick={next} aria-label="Siguiente">
                   →
@@ -136,7 +133,7 @@ export default function PortfolioGallery({ galeria }: { galeria: GaleriaItem[] }
             <div className="lb-thumbs">
               {photos.map((src, i) => (
                 <button
-                  key={src}
+                  key={`${src}-${i}`}
                   type="button"
                   className={`lb-thumb${i === index ? " lb-thumb-active" : ""}`}
                   onClick={() => setIndex(i)}

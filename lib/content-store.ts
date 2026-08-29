@@ -34,13 +34,8 @@ export async function loadStoredData(): Promise<StoredData> {
     const res = await fetch(url, { cache: "no-store" });
     if (!res.ok) return fallback;
     const data = (await res.json()) as Partial<StoredData>;
-    // Backfill `related` on stored gallery items saved before that field existed.
-    const galeria = (data.content?.galeria ?? fallback.content.galeria).map((g) => ({
-      ...g,
-      related: g.related ?? fallback.content.galeria.find((d) => d.id === g.id)?.related ?? [],
-    }));
     return {
-      content: { ...fallback.content, ...data.content, galeria },
+      content: { ...fallback.content, ...data.content },
       library: data.library?.length ? data.library : fallback.library,
     };
   } catch {
