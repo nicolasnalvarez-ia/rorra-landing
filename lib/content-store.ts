@@ -1,4 +1,4 @@
-import { list, put } from "@vercel/blob";
+import { getJson, putJson } from "./supabase-storage";
 import {
   DEFAULT_FOCAL,
   defaultContent,
@@ -8,7 +8,7 @@ import {
   type LibraryItem,
 } from "./content";
 
-const CONTENT_PATHNAME = "rorra-site-content.json";
+const CONTENT_PATH = "rorra-site-content.json";
 
 export type StoredData = {
   content: SiteContent;
@@ -69,34 +69,16 @@ function normalizeContent(stored: Partial<SiteContent> | undefined, fallback: Si
   };
 }
 
-async function findContentBlobUrl(): Promise<string | null> {
-  if (!process.env.BLOB_READ_WRITE_TOKEN) return null;
-  const { blobs } = await list({ prefix: CONTENT_PATHNAME, limit: 1 });
-  return blobs[0]?.url ?? null;
-}
-
 export async function loadStoredData(): Promise<StoredData> {
   const fallback = defaultData();
-  try {
-    const url = await findContentBlobUrl();
-    if (!url) return fallback;
-    const res = await fetch(url, { cache: "no-store" });
-    if (!res.ok) return fallback;
-    const data = (await res.json()) as Partial<StoredData>;
-    return {
-      content: normalizeContent(data.content, fallback.content),
-      library: data.library?.length ? data.library : fallback.library,
-    };
-  } catch {
-    return fallback;
-  }
+  const data = await getJson<Partial<StoredData>>(CONTENT_PATH);
+  if (!data) return fallback;
+  return {
+    content: normalizeContent(data.content, fallback.content),
+    library: data.library?.length ? data.library : fallback.library,
+  };
 }
 
 export async function saveStoredData(data: StoredData): Promise<void> {
-  await put(CONTENT_PATHNAME, JSON.stringify(data, null, 2), {
-    access: "public",
-    addRandomSuffix: false,
-    allowOverwrite: true,
-    contentType: "application/json",
-  });
+  await putJson(CONTENT_PATH, data);
 }

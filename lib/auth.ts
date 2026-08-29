@@ -1,9 +1,9 @@
 // Uses the Web Crypto API (globalThis.crypto) so this works both in the
 // Node.js runtime (API routes) and the Edge runtime (middleware).
-import { list, put } from "@vercel/blob";
+import { getJson, putJson } from "./supabase-storage";
 
 export const ADMIN_COOKIE = "rorra_admin_session";
-const CREDENTIALS_PATHNAME = "rorra-admin-credentials.json";
+const CREDENTIALS_PATH = "rorra-admin-credentials.json";
 
 const encoder = new TextEncoder();
 
@@ -45,42 +45,21 @@ async function envPasswordHash(): Promise<string> {
   return sha256Hex(pw);
 }
 
-async function findCredentialsBlobUrl(): Promise<string | null> {
-  if (!process.env.BLOB_READ_WRITE_TOKEN) return null;
-  const { blobs } = await list({ prefix: CREDENTIALS_PATHNAME, limit: 1 });
-  return blobs[0]?.url ?? null;
-}
-
 /**
  * The password hash currently in effect: whatever was set via the admin
  * "cambiar contraseña" flow, or (until changed at least once) a hash of the
- * ADMIN_PASSWORD env var. Storing this in Blob instead of only the env var
- * is what lets the password change without a redeploy.
+ * ADMIN_PASSWORD env var. Storing this in Supabase instead of only the env
+ * var is what lets the password change without a redeploy.
  */
 async function getCurrentPasswordHash(): Promise<string> {
-  try {
-    const url = await findCredentialsBlobUrl();
-    if (url) {
-      const res = await fetch(url, { cache: "no-store" });
-      if (res.ok) {
-        const data = (await res.json()) as { passwordHash?: string };
-        if (data.passwordHash) return data.passwordHash;
-      }
-    }
-  } catch {
-    // fall through to the env var
-  }
+  const data = await getJson<{ passwordHash?: string }>(CREDENTIALS_PATH);
+  if (data?.passwordHash) return data.passwordHash;
   return envPasswordHash();
 }
 
 export async function setPassword(newPassword: string): Promise<void> {
   const passwordHash = await sha256Hex(newPassword);
-  await put(CREDENTIALS_PATHNAME, JSON.stringify({ passwordHash }), {
-    access: "public",
-    addRandomSuffix: false,
-    allowOverwrite: true,
-    contentType: "application/json",
-  });
+  await putJson(CREDENTIALS_PATH, { passwordHash });
 }
 
 /** Derives a session token from the current password hash so the cookie never stores the password itself, and changing the password invalidates old sessions. */

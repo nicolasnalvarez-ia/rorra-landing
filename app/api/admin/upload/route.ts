@@ -1,13 +1,13 @@
-import { put } from "@vercel/blob";
 import { NextResponse } from "next/server";
+import { uploadImage } from "@/lib/supabase-storage";
 
 const MAX_SIZE = 8 * 1024 * 1024; // 8MB
 const ALLOWED_TYPES = ["image/jpeg", "image/png", "image/webp", "image/gif"];
 
 export async function POST(request: Request) {
-  if (!process.env.BLOB_READ_WRITE_TOKEN) {
+  if (!process.env.SUPABASE_URL || !process.env.SUPABASE_SERVICE_ROLE_KEY) {
     return NextResponse.json(
-      { error: "El almacenamiento de imágenes (Vercel Blob) no está configurado." },
+      { error: "El almacenamiento de imágenes (Supabase) no está configurado." },
       { status: 500 }
     );
   }
@@ -26,10 +26,8 @@ export async function POST(request: Request) {
   }
 
   const safeName = file.name.replace(/[^a-zA-Z0-9.\-_]/g, "-");
-  const blob = await put(`uploads/${Date.now()}-${safeName}`, file, {
-    access: "public",
-    addRandomSuffix: true,
-  });
+  const random = Math.random().toString(36).slice(2, 8);
+  const url = await uploadImage(`uploads/${Date.now()}-${random}-${safeName}`, file, file.type);
 
-  return NextResponse.json({ url: blob.url, label: file.name.replace(/\.[a-z]+$/i, "") });
+  return NextResponse.json({ url, label: file.name.replace(/\.[a-z]+$/i, "") });
 }
