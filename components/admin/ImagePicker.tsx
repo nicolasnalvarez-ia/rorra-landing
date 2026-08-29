@@ -1,7 +1,7 @@
 "use client";
 
 import UploadButton from "@/components/admin/UploadButton";
-import type { LibraryItem } from "@/lib/content";
+import { getFocal, type LibraryItem } from "@/lib/content";
 
 export default function ImagePicker({
   title,
@@ -49,7 +49,11 @@ export default function ImagePicker({
               title={item.label}
             >
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={item.url} alt={item.label} />
+              <img
+                src={item.url}
+                alt={item.label}
+                style={{ objectPosition: `${getFocal(library, item.url).x}% ${getFocal(library, item.url).y}%` }}
+              />
             </button>
           ))}
         </div>

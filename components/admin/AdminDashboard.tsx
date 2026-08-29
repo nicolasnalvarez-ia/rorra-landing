@@ -3,14 +3,20 @@
 import { useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import CategoryCard from "@/components/admin/CategoryCard";
+import FocalPointEditor from "@/components/admin/FocalPointEditor";
 import ImagePicker from "@/components/admin/ImagePicker";
 import UploadButton from "@/components/admin/UploadButton";
 import type { StoredData } from "@/lib/content-store";
-import type { GaleriaItem, LibraryItem, SiteContent } from "@/lib/content";
+import { getFocal, type FocalPoint, type GaleriaItem, type LibraryItem, type SiteContent } from "@/lib/content";
 import { buildSlots } from "@/lib/slots";
 
 type Status = { type: "idle" | "saving" | "saved" | "error"; message?: string };
 type Picker = { type: "slot"; key: string } | { type: "category"; id: string } | null;
+
+function focalCss(library: LibraryItem[], url: string) {
+  const { x, y } = getFocal(library, url);
+  return `${x}% ${y}%`;
+}
 
 function newId() {
   return `g-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 7)}`;
@@ -29,6 +35,7 @@ export default function AdminDashboard({ initialData }: { initialData: StoredDat
     setLibraryState(next);
   }
   const [picker, setPicker] = useState<Picker>(null);
+  const [focalItem, setFocalItem] = useState<LibraryItem | null>(null);
   const [status, setStatus] = useState<Status>({ type: "idle" });
   const [newCategoryTag, setNewCategoryTag] = useState("");
 
@@ -105,6 +112,36 @@ export default function AdminDashboard({ initialData }: { initialData: StoredDat
     addToLibrary(item);
   }
 
+  function saveFocal(id: string, focal: FocalPoint) {
+    const nextLibrary = libraryRef.current.map((l) => (l.id === id ? { ...l, focal } : l));
+    setLibrary(nextLibrary);
+    setFocalItem(null);
+    persist(content, nextLibrary);
+  }
+
+  function findUsages(url: string): string[] {
+    const usages: string[] = [];
+    if (content.hero.image1 === url) usages.push("Hero, foto 1");
+    if (content.hero.image2 === url) usages.push("Hero, foto 2");
+    if (content.sobreMi.image === url) usages.push("Sobre mí");
+    content.galeria.forEach((g) => {
+      if (g.photos.includes(url)) usages.push(`Portfolio · ${g.tag}`);
+    });
+    return usages;
+  }
+
+  function deleteFromLibrary(item: LibraryItem) {
+    const usages = findUsages(item.url);
+    const question =
+      usages.length > 0
+        ? `Esta foto se está usando en: ${usages.join(", ")}. Si la sacás de la biblioteca vas a dejar de poder elegirla para nuevos lugares, pero va a seguir viéndose donde ya está puesta. ¿Sacarla igual?`
+        : "¿Sacar esta foto de la biblioteca?";
+    if (!window.confirm(question)) return;
+    const nextLibrary = libraryRef.current.filter((l) => l.id !== item.id);
+    setLibrary(nextLibrary);
+    persist(content, nextLibrary);
+  }
+
   function onError(message: string) {
     setStatus({ type: "error", message });
   }
@@ -156,7 +193,12 @@ export default function AdminDashboard({ initialData }: { initialData: StoredDat
                 .map((slot) => (
                   <div key={slot.key} className="adm-slot-card">
                     {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img src={slot.get(content)} alt={slot.label} className="adm-slot-img" />
+                    <img
+                      src={slot.get(content)}
+                      alt={slot.label}
+                      className="adm-slot-img"
+                      style={{ objectPosition: focalCss(library, slot.get(content)) }}
+                    />
                     <div className="adm-slot-body">
                       <div className="adm-slot-label">{slot.label}</div>
                       <button
@@ -189,6 +231,7 @@ export default function AdminDashboard({ initialData }: { initialData: StoredDat
               <CategoryCard
                 key={cat.id}
                 category={cat}
+                library={library}
                 onRename={(tag) => renameCategory(cat.id, tag)}
                 onDelete={() => deleteCategory(cat.id)}
                 onRemovePhoto={(i) => removePhoto(cat.id, i)}
@@ -231,9 +274,27 @@ export default function AdminDashboard({ initialData }: { initialData: StoredDat
           </div>
           <div className="adm-cat-photos">
             {library.map((item) => (
-              <div className="adm-photo-tile" key={item.id} title={item.label}>
+              <div className="adm-photo-tile adm-lib-tile" key={item.id} title={item.label}>
                 {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={item.url} alt={item.label} />
+                <img src={item.url} alt={item.label} style={{ objectPosition: focalCss(library, item.url) }} />
+                <button
+                  type="button"
+                  className="adm-focal-btn"
+                  onClick={() => setFocalItem(item)}
+                  aria-label="Ajustar encuadre"
+                  title="Ajustar encuadre"
+                >
+                  ⤢
+                </button>
+                <button
+                  type="button"
+                  className="adm-photo-remove"
+                  onClick={() => deleteFromLibrary(item)}
+                  aria-label="Sacar de la biblioteca"
+                  title="Sacar de la biblioteca"
+                >
+                  ×
+                </button>
               </div>
             ))}
           </div>
@@ -260,6 +321,14 @@ export default function AdminDashboard({ initialData }: { initialData: StoredDat
           onClose={() => setPicker(null)}
           onUploaded={onPickerUploaded}
           onError={onError}
+        />
+      )}
+
+      {focalItem && (
+        <FocalPointEditor
+          item={focalItem}
+          onSave={(focal) => saveFocal(focalItem.id, focal)}
+          onClose={() => setFocalItem(null)}
         />
       )}
     </div>

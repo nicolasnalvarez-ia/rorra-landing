@@ -1,9 +1,19 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
-import type { GaleriaItem } from "@/lib/content";
+import { getFocal, type FocalPoint, type GaleriaItem, type LibraryItem } from "@/lib/content";
 
-export default function PortfolioGallery({ galeria }: { galeria: GaleriaItem[] }) {
+function focalCss(focal: FocalPoint) {
+  return `${focal.x}% ${focal.y}%`;
+}
+
+export default function PortfolioGallery({
+  galeria,
+  library,
+}: {
+  galeria: GaleriaItem[];
+  library: LibraryItem[];
+}) {
   const [openItem, setOpenItem] = useState<GaleriaItem | null>(null);
   const [index, setIndex] = useState(0);
   const [closing, setClosing] = useState(false);
@@ -63,7 +73,13 @@ export default function PortfolioGallery({ galeria }: { galeria: GaleriaItem[] }
             <img
               src={g.photos[0]}
               alt={g.tag}
-              style={{ width: "100%", aspectRatio: "3/4", objectFit: "cover", display: "block" }}
+              style={{
+                width: "100%",
+                aspectRatio: "3/4",
+                objectFit: "cover",
+                objectPosition: focalCss(getFocal(library, g.photos[0])),
+                display: "block",
+              }}
             />
             <span className="pf-card-hint">＋ ver más</span>
             <span
@@ -140,7 +156,7 @@ export default function PortfolioGallery({ galeria }: { galeria: GaleriaItem[] }
                   aria-label={`Foto ${i + 1}`}
                 >
                   {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={src} alt="" />
+                  <img src={src} alt="" style={{ objectPosition: focalCss(getFocal(library, src)) }} />
                 </button>
               ))}
             </div>

@@ -1,10 +1,10 @@
 import PortfolioGallery from "@/components/PortfolioGallery";
-import type { SiteContent } from "@/lib/content";
+import type { LibraryItem, SiteContent } from "@/lib/content";
 
 const MARQUEE_TEXT =
   "UGC · Moda · Lifestyle · Beauty · Unboxings · Reviews · Videos para TikTok e Instagram · Fotos de producto · ";
 
-export default function Landing({ content }: { content: SiteContent }) {
+export default function Landing({ content, library }: { content: SiteContent; library: LibraryItem[] }) {
   return (
     <div style={{ minHeight: "100vh", background: "#FAF5EE" }}>
       <header
@@ -344,7 +344,7 @@ export default function Landing({ content }: { content: SiteContent }) {
             Un poco de lo que hago
           </h2>
         </div>
-        <PortfolioGallery galeria={content.galeria} />
+        <PortfolioGallery galeria={content.galeria} library={library} />
         <p style={{ textAlign: "center", fontSize: 15, color: "#5C5248", margin: 0 }}>
           Más en{" "}
           <a

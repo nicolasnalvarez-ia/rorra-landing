@@ -123,8 +123,19 @@ export const defaultContent: SiteContent = {
   ],
 };
 
+/** Crop focal point as percentages (0-100) from the top-left, used with CSS object-position. */
+export type FocalPoint = { x: number; y: number };
+
+export const DEFAULT_FOCAL: FocalPoint = { x: 50, y: 50 };
+
 export type LibraryItem = {
   id: string;
   url: string;
   label: string;
+  /** Where to keep the crop centered when this photo is shown in a cropped (object-fit: cover) spot. */
+  focal?: FocalPoint;
 };
+
+export function getFocal(library: LibraryItem[], url: string): FocalPoint {
+  return library.find((item) => item.url === url)?.focal ?? DEFAULT_FOCAL;
+}

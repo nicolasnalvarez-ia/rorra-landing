@@ -1,16 +1,18 @@
 "use client";
 
 import { useState } from "react";
-import type { GaleriaItem } from "@/lib/content";
+import { getFocal, type GaleriaItem, type LibraryItem } from "@/lib/content";
 
 export default function CategoryCard({
   category,
+  library,
   onRename,
   onDelete,
   onRemovePhoto,
   onAddPhoto,
 }: {
   category: GaleriaItem;
+  library: LibraryItem[];
   onRename: (tag: string) => void;
   onDelete: () => void;
   onRemovePhoto: (index: number) => void;
@@ -46,7 +48,11 @@ export default function CategoryCard({
         {category.photos.map((src, i) => (
           <div className="adm-photo-tile" key={`${src}-${i}`}>
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={src} alt={`${category.tag} ${i + 1}`} />
+            <img
+              src={src}
+              alt={`${category.tag} ${i + 1}`}
+              style={{ objectPosition: `${getFocal(library, src).x}% ${getFocal(library, src).y}%` }}
+            />
             {category.photos.length > 1 && (
               <button
                 type="button"
