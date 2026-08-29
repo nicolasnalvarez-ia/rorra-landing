@@ -22,6 +22,8 @@ export function focalCss(focal: FocalPoint): string {
 export type CroppedPhoto = { url: string; focal: FocalPoint };
 
 export const CROP_ASPECT = "3 / 4";
+/** Same ratio as CROP_ASPECT, as a number (width / height) for crop-geometry math. */
+export const CROP_ASPECT_RATIO = 3 / 4;
 
 export function croppedPhoto(url: string, focal: FocalPoint = DEFAULT_FOCAL): CroppedPhoto {
   return { url, focal };
