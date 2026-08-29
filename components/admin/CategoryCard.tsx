@@ -1,21 +1,21 @@
 "use client";
 
 import { useState } from "react";
-import { getFocal, type GaleriaItem, type LibraryItem } from "@/lib/content";
+import { focalCss, type GaleriaItem } from "@/lib/content";
 
 export default function CategoryCard({
   category,
-  library,
   onRename,
   onDelete,
   onRemovePhoto,
+  onEditCrop,
   onAddPhoto,
 }: {
   category: GaleriaItem;
-  library: LibraryItem[];
   onRename: (tag: string) => void;
   onDelete: () => void;
   onRemovePhoto: (index: number) => void;
+  onEditCrop: (index: number) => void;
   onAddPhoto: () => void;
 }) {
   const [tag, setTag] = useState(category.tag);
@@ -45,20 +45,26 @@ export default function CategoryCard({
         </button>
       </div>
       <div className="adm-cat-photos">
-        {category.photos.map((src, i) => (
-          <div className="adm-photo-tile" key={`${src}-${i}`}>
+        {category.photos.map((photo, i) => (
+          <div className="adm-photo-tile adm-lib-tile" key={`${photo.url}-${i}`}>
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src={src}
-              alt={`${category.tag} ${i + 1}`}
-              style={{ objectPosition: `${getFocal(library, src).x}% ${getFocal(library, src).y}%` }}
-            />
+            <img src={photo.url} alt={`${category.tag} ${i + 1}`} style={{ objectPosition: focalCss(photo.focal) }} />
+            <button
+              type="button"
+              className="adm-focal-btn"
+              onClick={() => onEditCrop(i)}
+              aria-label="Ajustar encuadre"
+              title="Ajustar encuadre"
+            >
+              ⤢
+            </button>
             {category.photos.length > 1 && (
               <button
                 type="button"
                 className="adm-photo-remove"
                 onClick={() => onRemovePhoto(i)}
                 aria-label="Quitar foto"
+                title="Quitar de la categoría"
               >
                 ×
               </button>

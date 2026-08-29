@@ -4,21 +4,44 @@ export type Servicio = {
   desc: string;
 };
 
+/** Crop focal point as percentages (0-100) from the top-left, used with CSS object-position. */
+export type FocalPoint = { x: number; y: number };
+
+export const DEFAULT_FOCAL: FocalPoint = { x: 50, y: 50 };
+
+export function focalCss(focal: FocalPoint): string {
+  return `${focal.x}% ${focal.y}%`;
+}
+
+/**
+ * A photo placed somewhere it gets cropped (object-fit: cover). Every cropped
+ * spot on the site uses the same 3:4 aspect ratio, and the focal point is
+ * chosen per placement (not per photo) since the same photo can be used in
+ * different spots.
+ */
+export type CroppedPhoto = { url: string; focal: FocalPoint };
+
+export const CROP_ASPECT = "3 / 4";
+
+export function croppedPhoto(url: string, focal: FocalPoint = DEFAULT_FOCAL): CroppedPhoto {
+  return { url, focal };
+}
+
 export type GaleriaItem = {
   id: string;
   tag: string;
   /** All photos in this category. photos[0] is the cover shown on the grid. */
-  photos: string[];
+  photos: CroppedPhoto[];
 };
 
 export type SiteContent = {
   hero: {
     badgeText: string;
-    image1: string;
-    image2: string;
+    image1: CroppedPhoto;
+    image2: CroppedPhoto;
   };
   sobreMi: {
-    image: string;
+    image: CroppedPhoto;
     tags: string[];
   };
   servicios: Servicio[];
@@ -45,11 +68,11 @@ export const PHOTO_LIBRARY = [
 export const defaultContent: SiteContent = {
   hero: {
     badgeText: "Content creator & UGC",
-    image1: "/photos/zebra-selfie.jpg",
-    image2: "/photos/bikini-rosa.jpg",
+    image1: croppedPhoto("/photos/zebra-selfie.jpg"),
+    image2: croppedPhoto("/photos/bikini-rosa.jpg"),
   },
   sobreMi: {
-    image: "/photos/pergola.jpg",
+    image: croppedPhoto("/photos/pergola.jpg"),
     tags: ["Moda", "Lifestyle", "Beauty", "Food & travel"],
   },
   servicios: [
@@ -73,69 +96,82 @@ export const defaultContent: SiteContent = {
     {
       id: "g1",
       tag: "night out",
-      photos: ["/photos/vestido-noche.jpg", "/photos/noche-espalda.jpg", "/photos/city-night.jpg"],
+      photos: [
+        croppedPhoto("/photos/vestido-noche.jpg"),
+        croppedPhoto("/photos/noche-espalda.jpg"),
+        croppedPhoto("/photos/city-night.jpg"),
+      ],
     },
     {
       id: "g2",
       tag: "travel",
-      photos: ["/photos/texas.jpg", "/photos/city-night.jpg", "/photos/pergola.jpg"],
+      photos: [
+        croppedPhoto("/photos/texas.jpg"),
+        croppedPhoto("/photos/city-night.jpg"),
+        croppedPhoto("/photos/pergola.jpg"),
+      ],
     },
     {
       id: "g3",
       tag: "fits",
       photos: [
-        "/photos/mirror.jpg",
-        "/photos/camiseta-argentina.jpg",
-        "/photos/zebra-selfie.jpg",
-        "/photos/vestido-noche.jpg",
+        croppedPhoto("/photos/mirror.jpg"),
+        croppedPhoto("/photos/camiseta-argentina.jpg"),
+        croppedPhoto("/photos/zebra-selfie.jpg"),
+        croppedPhoto("/photos/vestido-noche.jpg"),
       ],
     },
     {
       id: "g4",
       tag: "summer",
-      photos: ["/photos/pool.jpg", "/photos/bikini-rosa.jpg", "/photos/pergola.jpg"],
+      photos: [
+        croppedPhoto("/photos/pool.jpg"),
+        croppedPhoto("/photos/bikini-rosa.jpg"),
+        croppedPhoto("/photos/pergola.jpg"),
+      ],
     },
     {
       id: "g5",
       tag: "on camera",
-      photos: ["/photos/camiseta-argentina.jpg", "/photos/zebra-selfie.jpg", "/photos/mirror.jpg"],
+      photos: [
+        croppedPhoto("/photos/camiseta-argentina.jpg"),
+        croppedPhoto("/photos/zebra-selfie.jpg"),
+        croppedPhoto("/photos/mirror.jpg"),
+      ],
     },
     {
       id: "g6",
       tag: "haul",
-      photos: ["/photos/ross.jpg", "/photos/mirror.jpg", "/photos/camiseta-argentina.jpg"],
+      photos: [
+        croppedPhoto("/photos/ross.jpg"),
+        croppedPhoto("/photos/mirror.jpg"),
+        croppedPhoto("/photos/camiseta-argentina.jpg"),
+      ],
     },
     {
       id: "g7",
       tag: "food",
-      photos: ["/photos/sushi.jpg", "/photos/city-night.jpg", "/photos/texas.jpg"],
+      photos: [
+        croppedPhoto("/photos/sushi.jpg"),
+        croppedPhoto("/photos/city-night.jpg"),
+        croppedPhoto("/photos/texas.jpg"),
+      ],
     },
     {
       id: "g8",
       tag: "glam",
       photos: [
-        "/photos/noche-espalda.jpg",
-        "/photos/vestido-noche.jpg",
-        "/photos/zebra-selfie.jpg",
-        "/photos/city-night.jpg",
+        croppedPhoto("/photos/noche-espalda.jpg"),
+        croppedPhoto("/photos/vestido-noche.jpg"),
+        croppedPhoto("/photos/zebra-selfie.jpg"),
+        croppedPhoto("/photos/city-night.jpg"),
       ],
     },
   ],
 };
 
-/** Crop focal point as percentages (0-100) from the top-left, used with CSS object-position. */
-export type FocalPoint = { x: number; y: number };
-
-export const DEFAULT_FOCAL: FocalPoint = { x: 50, y: 50 };
-
 export type LibraryItem = {
   id: string;
   url: string;
   label: string;
-  /** Where to keep the crop centered when this photo is shown in a cropped (object-fit: cover) spot. */
-  focal?: FocalPoint;
 };
-
-export function getFocal(library: LibraryItem[], url: string): FocalPoint {
-  return library.find((item) => item.url === url)?.focal ?? DEFAULT_FOCAL;
-}

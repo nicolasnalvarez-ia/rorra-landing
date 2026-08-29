@@ -1,21 +1,19 @@
 "use client";
 
 import UploadButton from "@/components/admin/UploadButton";
-import { getFocal, type LibraryItem } from "@/lib/content";
+import type { LibraryItem } from "@/lib/content";
 
 export default function ImagePicker({
   title,
   library,
-  currentUrl,
-  onSelect,
+  onPick,
   onClose,
   onUploaded,
   onError,
 }: {
   title: string;
   library: LibraryItem[];
-  currentUrl?: string;
-  onSelect: (url: string) => void;
+  onPick: (url: string) => void;
   onClose: () => void;
   onUploaded: (item: LibraryItem) => void;
   onError: (message: string) => void;
@@ -31,7 +29,7 @@ export default function ImagePicker({
               onError={onError}
               onUploaded={(item) => {
                 onUploaded(item);
-                onSelect(item.url);
+                onPick(item.url);
               }}
             />
             <button type="button" className="adm-modal-close" onClick={onClose} aria-label="Cerrar">
@@ -44,16 +42,12 @@ export default function ImagePicker({
             <button
               key={item.id}
               type="button"
-              className={`adm-picker-item${item.url === currentUrl ? " is-active" : ""}`}
-              onClick={() => onSelect(item.url)}
+              className="adm-picker-item"
+              onClick={() => onPick(item.url)}
               title={item.label}
             >
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src={item.url}
-                alt={item.label}
-                style={{ objectPosition: `${getFocal(library, item.url).x}% ${getFocal(library, item.url).y}%` }}
-              />
+              <img src={item.url} alt={item.label} />
             </button>
           ))}
         </div>

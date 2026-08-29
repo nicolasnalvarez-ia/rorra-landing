@@ -1,10 +1,10 @@
 import PortfolioGallery from "@/components/PortfolioGallery";
-import type { LibraryItem, SiteContent } from "@/lib/content";
+import { CROP_ASPECT, focalCss, type SiteContent } from "@/lib/content";
 
 const MARQUEE_TEXT =
   "UGC · Moda · Lifestyle · Beauty · Unboxings · Reviews · Videos para TikTok e Instagram · Fotos de producto · ";
 
-export default function Landing({ content, library }: { content: SiteContent; library: LibraryItem[] }) {
+export default function Landing({ content }: { content: SiteContent }) {
   return (
     <div style={{ minHeight: "100vh", background: "#FAF5EE" }}>
       <header
@@ -121,10 +121,13 @@ export default function Landing({ content, library }: { content: SiteContent; li
         >
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
-            src={content.hero.image1}
+            src={content.hero.image1.url}
             alt="Rocío selfie"
             style={{
               width: "100%",
+              aspectRatio: CROP_ASPECT,
+              objectFit: "cover",
+              objectPosition: focalCss(content.hero.image1.focal),
               borderRadius: 16,
               display: "block",
               marginTop: 40,
@@ -133,10 +136,13 @@ export default function Landing({ content, library }: { content: SiteContent; li
           />
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
-            src={content.hero.image2}
+            src={content.hero.image2.url}
             alt="Rocío en la ciudad"
             style={{
               width: "100%",
+              aspectRatio: CROP_ASPECT,
+              objectFit: "cover",
+              objectPosition: focalCss(content.hero.image2.focal),
               borderRadius: 16,
               display: "block",
               boxShadow: "0 20px 40px rgba(34,27,20,0.18)",
@@ -177,10 +183,13 @@ export default function Landing({ content, library }: { content: SiteContent; li
       >
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
-          src={content.sobreMi.image}
+          src={content.sobreMi.image.url}
           alt="Rocío"
           style={{
             width: "100%",
+            aspectRatio: CROP_ASPECT,
+            objectFit: "cover",
+            objectPosition: focalCss(content.sobreMi.image.focal),
             borderRadius: 16,
             display: "block",
             boxShadow: "0 20px 40px rgba(34,27,20,0.15)",
@@ -344,7 +353,7 @@ export default function Landing({ content, library }: { content: SiteContent; li
             Un poco de lo que hago
           </h2>
         </div>
-        <PortfolioGallery galeria={content.galeria} library={library} />
+        <PortfolioGallery galeria={content.galeria} />
         <p style={{ textAlign: "center", fontSize: 15, color: "#5C5248", margin: 0 }}>
           Más en{" "}
           <a

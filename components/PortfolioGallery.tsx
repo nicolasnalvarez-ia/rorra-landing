@@ -1,19 +1,9 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { getFocal, type FocalPoint, type GaleriaItem, type LibraryItem } from "@/lib/content";
+import { CROP_ASPECT, focalCss, type GaleriaItem } from "@/lib/content";
 
-function focalCss(focal: FocalPoint) {
-  return `${focal.x}% ${focal.y}%`;
-}
-
-export default function PortfolioGallery({
-  galeria,
-  library,
-}: {
-  galeria: GaleriaItem[];
-  library: LibraryItem[];
-}) {
+export default function PortfolioGallery({ galeria }: { galeria: GaleriaItem[] }) {
   const [openItem, setOpenItem] = useState<GaleriaItem | null>(null);
   const [index, setIndex] = useState(0);
   const [closing, setClosing] = useState(false);
@@ -61,44 +51,46 @@ export default function PortfolioGallery({
   return (
     <>
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(220px, 1fr))", gap: 16 }}>
-        {galeria.filter((g) => g.photos.length > 0).map((g) => (
-          <button
-            key={g.id}
-            type="button"
-            className="pf-card"
-            onClick={() => open(g)}
-            aria-label={`Ver más fotos de ${g.tag}`}
-          >
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src={g.photos[0]}
-              alt={g.tag}
-              style={{
-                width: "100%",
-                aspectRatio: "3/4",
-                objectFit: "cover",
-                objectPosition: focalCss(getFocal(library, g.photos[0])),
-                display: "block",
-              }}
-            />
-            <span className="pf-card-hint">＋ ver más</span>
-            <span
-              style={{
-                position: "absolute",
-                left: 10,
-                bottom: 10,
-                background: "rgba(250,245,238,0.92)",
-                borderRadius: 999,
-                padding: "5px 14px",
-                fontSize: 12,
-                fontWeight: 600,
-                color: "#221B14",
-              }}
+        {galeria
+          .filter((g) => g.photos.length > 0)
+          .map((g) => (
+            <button
+              key={g.id}
+              type="button"
+              className="pf-card"
+              onClick={() => open(g)}
+              aria-label={`Ver más fotos de ${g.tag}`}
             >
-              {g.tag}
-            </span>
-          </button>
-        ))}
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={g.photos[0].url}
+                alt={g.tag}
+                style={{
+                  width: "100%",
+                  aspectRatio: CROP_ASPECT,
+                  objectFit: "cover",
+                  objectPosition: focalCss(g.photos[0].focal),
+                  display: "block",
+                }}
+              />
+              <span className="pf-card-hint">＋ ver más</span>
+              <span
+                style={{
+                  position: "absolute",
+                  left: 10,
+                  bottom: 10,
+                  background: "rgba(250,245,238,0.92)",
+                  borderRadius: 999,
+                  padding: "5px 14px",
+                  fontSize: 12,
+                  fontWeight: 600,
+                  color: "#221B14",
+                }}
+              >
+                {g.tag}
+              </span>
+            </button>
+          ))}
       </div>
 
       {openItem && (
@@ -138,7 +130,12 @@ export default function PortfolioGallery({
                 </button>
               )}
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img key={`${photos[index]}-${index}`} src={photos[index]} alt={openItem.tag} className="lb-img" />
+              <img
+                key={`${photos[index].url}-${index}`}
+                src={photos[index].url}
+                alt={openItem.tag}
+                className="lb-img"
+              />
               {photos.length > 1 && (
                 <button type="button" className="lb-arrow" onClick={next} aria-label="Siguiente">
                   →
@@ -147,16 +144,16 @@ export default function PortfolioGallery({
             </div>
 
             <div className="lb-thumbs">
-              {photos.map((src, i) => (
+              {photos.map((photo, i) => (
                 <button
-                  key={`${src}-${i}`}
+                  key={`${photo.url}-${i}`}
                   type="button"
                   className={`lb-thumb${i === index ? " lb-thumb-active" : ""}`}
                   onClick={() => setIndex(i)}
                   aria-label={`Foto ${i + 1}`}
                 >
                   {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={src} alt="" style={{ objectPosition: focalCss(getFocal(library, src)) }} />
+                  <img src={photo.url} alt="" style={{ objectPosition: focalCss(photo.focal) }} />
                 </button>
               ))}
             </div>
