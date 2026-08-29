@@ -164,7 +164,7 @@ a:hover {
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 24px;
+  padding: clamp(12px, 4vw, 24px);
   animation: lbFadeIn 0.3s ease both;
   transition: opacity 0.28s ease;
 }
@@ -307,4 +307,27 @@ a:hover {
 .lb-thumb-active {
   opacity: 1;
   border-color: #e8906b;
+}
+
+/* ── responsive: stack the hero and sobre-mí grids on narrow screens ── */
+.hero-grid {
+  grid-template-columns: 1fr;
+  gap: 40px;
+}
+
+.sobre-mi-grid {
+  grid-template-columns: 1fr;
+  gap: 36px;
+}
+
+@media (min-width: 860px) {
+  .hero-grid {
+    grid-template-columns: 1.1fr 0.9fr;
+    gap: 64px;
+  }
+
+  .sobre-mi-grid {
+    grid-template-columns: 0.8fr 1.2fr;
+    gap: 72px;
+  }
 }
