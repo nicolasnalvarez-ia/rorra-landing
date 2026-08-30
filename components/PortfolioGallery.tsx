@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { CROP_ASPECT, focalStyle, type GaleriaItem } from "@/lib/content";
+import CroppedImage from "@/components/CroppedImage";
 
 export default function PortfolioGallery({ galeria }: { galeria: GaleriaItem[] }) {
   const [openItem, setOpenItem] = useState<GaleriaItem | null>(null);
@@ -129,12 +130,17 @@ export default function PortfolioGallery({ galeria }: { galeria: GaleriaItem[] }
                   ←
                 </button>
               )}
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
+              <CroppedImage
                 key={`${photos[index].url}-${index}`}
-                src={photos[index].url}
+                photo={photos[index]}
                 alt={openItem.tag}
-                className="lb-img"
+                style={{
+                  maxWidth: "100%",
+                  maxHeight: "62vh",
+                  borderRadius: 18,
+                  boxShadow: "0 40px 90px rgba(0, 0, 0, 0.5)",
+                  animation: "lbImgIn 0.5s cubic-bezier(0.16, 1, 0.3, 1) both",
+                }}
               />
               {photos.length > 1 && (
                 <button type="button" className="lb-arrow" onClick={next} aria-label="Siguiente">
