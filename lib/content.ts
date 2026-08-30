@@ -4,22 +4,55 @@ export type Servicio = {
   desc: string;
 };
 
+/**
+ * Crop position as percentages (0-100) from the top-left, plus how far
+ * zoomed in the crop window is (1 = the loosest crop that still fills the
+ * target aspect ratio; higher = a smaller, tighter window on the photo).
+ */
+export type FocalPoint = { x: number; y: number; zoom: number };
+
+export const DEFAULT_FOCAL: FocalPoint = { x: 50, y: 50, zoom: 1 };
+export const MAX_ZOOM = 3;
+
+/** Inline style for a cropped <img> — pairs with object-fit: cover on the same element. */
+export function focalStyle(focal: FocalPoint): { objectPosition: string; transform?: string; transformOrigin?: string } {
+  const position = `${focal.x}% ${focal.y}%`;
+  if (focal.zoom === 1) return { objectPosition: position };
+  return { objectPosition: position, transform: `scale(${focal.zoom})`, transformOrigin: position };
+}
+
+/**
+ * A photo placed somewhere it gets cropped (object-fit: cover). Every cropped
+ * spot on the site uses the same 3:4 aspect ratio, and the crop is chosen per
+ * placement (not per photo) since the same photo can be used in different
+ * spots. The element showing it needs its own overflow: hidden ancestor,
+ * since zooming in scales the image past its own box.
+ */
+export type CroppedPhoto = { url: string; focal: FocalPoint };
+
+export const CROP_ASPECT = "3 / 4";
+/** Same ratio as CROP_ASPECT, as a number (width / height) for crop-geometry math. */
+export const CROP_ASPECT_RATIO = 3 / 4;
+
+export function croppedPhoto(url: string, focal: FocalPoint = DEFAULT_FOCAL): CroppedPhoto {
+  return { url, focal };
+}
+
 export type GaleriaItem = {
   id: string;
-  src: string;
   tag: string;
-  /** Additional photos of the same style, shown when the card is expanded. */
-  related: string[];
+  /** All photos in this category. photos[0] is the cover shown on the grid. */
+  photos: CroppedPhoto[];
 };
 
 export type SiteContent = {
   hero: {
     badgeText: string;
-    image1: string;
-    image2: string;
+    image1: CroppedPhoto;
+    image2: CroppedPhoto;
   };
   sobreMi: {
-    image: string;
+    image: CroppedPhoto;
     tags: string[];
   };
   servicios: Servicio[];
@@ -46,11 +79,11 @@ export const PHOTO_LIBRARY = [
 export const defaultContent: SiteContent = {
   hero: {
     badgeText: "Content creator & UGC",
-    image1: "/photos/zebra-selfie.jpg",
-    image2: "/photos/bikini-rosa.jpg",
+    image1: croppedPhoto("/photos/zebra-selfie.jpg"),
+    image2: croppedPhoto("/photos/bikini-rosa.jpg"),
   },
   sobreMi: {
-    image: "/photos/pergola.jpg",
+    image: croppedPhoto("/photos/pergola.jpg"),
     tags: ["Moda", "Lifestyle", "Beauty", "Food & travel"],
   },
   servicios: [
@@ -73,55 +106,83 @@ export const defaultContent: SiteContent = {
   galeria: [
     {
       id: "g1",
-      src: "/photos/vestido-noche.jpg",
       tag: "night out",
-      related: ["/photos/noche-espalda.jpg", "/photos/city-night.jpg"],
+      photos: [
+        croppedPhoto("/photos/vestido-noche.jpg"),
+        croppedPhoto("/photos/noche-espalda.jpg"),
+        croppedPhoto("/photos/city-night.jpg"),
+      ],
     },
     {
       id: "g2",
-      src: "/photos/texas.jpg",
       tag: "travel",
-      related: ["/photos/city-night.jpg", "/photos/pergola.jpg"],
+      photos: [
+        croppedPhoto("/photos/texas.jpg"),
+        croppedPhoto("/photos/city-night.jpg"),
+        croppedPhoto("/photos/pergola.jpg"),
+      ],
     },
     {
       id: "g3",
-      src: "/photos/mirror.jpg",
       tag: "fits",
-      related: ["/photos/camiseta-argentina.jpg", "/photos/zebra-selfie.jpg", "/photos/vestido-noche.jpg"],
+      photos: [
+        croppedPhoto("/photos/mirror.jpg"),
+        croppedPhoto("/photos/camiseta-argentina.jpg"),
+        croppedPhoto("/photos/zebra-selfie.jpg"),
+        croppedPhoto("/photos/vestido-noche.jpg"),
+      ],
     },
     {
       id: "g4",
-      src: "/photos/pool.jpg",
       tag: "summer",
-      related: ["/photos/bikini-rosa.jpg", "/photos/pergola.jpg"],
+      photos: [
+        croppedPhoto("/photos/pool.jpg"),
+        croppedPhoto("/photos/bikini-rosa.jpg"),
+        croppedPhoto("/photos/pergola.jpg"),
+      ],
     },
     {
       id: "g5",
-      src: "/photos/camiseta-argentina.jpg",
       tag: "on camera",
-      related: ["/photos/zebra-selfie.jpg", "/photos/mirror.jpg"],
+      photos: [
+        croppedPhoto("/photos/camiseta-argentina.jpg"),
+        croppedPhoto("/photos/zebra-selfie.jpg"),
+        croppedPhoto("/photos/mirror.jpg"),
+      ],
     },
     {
       id: "g6",
-      src: "/photos/ross.jpg",
       tag: "haul",
-      related: ["/photos/mirror.jpg", "/photos/camiseta-argentina.jpg"],
+      photos: [
+        croppedPhoto("/photos/ross.jpg"),
+        croppedPhoto("/photos/mirror.jpg"),
+        croppedPhoto("/photos/camiseta-argentina.jpg"),
+      ],
     },
     {
       id: "g7",
-      src: "/photos/sushi.jpg",
       tag: "food",
-      related: ["/photos/city-night.jpg", "/photos/texas.jpg"],
+      photos: [
+        croppedPhoto("/photos/sushi.jpg"),
+        croppedPhoto("/photos/city-night.jpg"),
+        croppedPhoto("/photos/texas.jpg"),
+      ],
     },
     {
       id: "g8",
-      src: "/photos/noche-espalda.jpg",
       tag: "glam",
-      related: ["/photos/vestido-noche.jpg", "/photos/zebra-selfie.jpg", "/photos/city-night.jpg"],
+      photos: [
+        croppedPhoto("/photos/noche-espalda.jpg"),
+        croppedPhoto("/photos/vestido-noche.jpg"),
+        croppedPhoto("/photos/zebra-selfie.jpg"),
+        croppedPhoto("/photos/city-night.jpg"),
+      ],
     },
   ],
 };
 
-export async function getContent(): Promise<SiteContent> {
-  return defaultContent;
-}
+export type LibraryItem = {
+  id: string;
+  url: string;
+  label: string;
+};

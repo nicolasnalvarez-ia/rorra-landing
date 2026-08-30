@@ -1,7 +1,9 @@
 import Landing from "@/components/Landing";
-import { getContent } from "@/lib/content";
+import { loadStoredData } from "@/lib/content-store";
+
+export const dynamic = "force-dynamic";
 
 export default async function Home() {
-  const content = await getContent();
+  const { content } = await loadStoredData();
   return <Landing content={content} />;
 }

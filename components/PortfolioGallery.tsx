@@ -1,17 +1,15 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
-import type { GaleriaItem } from "@/lib/content";
+import { CROP_ASPECT, focalStyle, type GaleriaItem } from "@/lib/content";
+import CroppedImage from "@/components/CroppedImage";
 
 export default function PortfolioGallery({ galeria }: { galeria: GaleriaItem[] }) {
   const [openItem, setOpenItem] = useState<GaleriaItem | null>(null);
   const [index, setIndex] = useState(0);
   const [closing, setClosing] = useState(false);
 
-  const photos = useMemo(() => {
-    if (!openItem) return [];
-    return [openItem.src, ...openItem.related.filter((src) => src !== openItem.src)];
-  }, [openItem]);
+  const photos = useMemo(() => openItem?.photos ?? [], [openItem]);
 
   const open = (item: GaleriaItem) => {
     setIndex(0);
@@ -54,38 +52,46 @@ export default function PortfolioGallery({ galeria }: { galeria: GaleriaItem[] }
   return (
     <>
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(220px, 1fr))", gap: 16 }}>
-        {galeria.map((g) => (
-          <button
-            key={g.id}
-            type="button"
-            className="pf-card"
-            onClick={() => open(g)}
-            aria-label={`Ver más fotos de ${g.tag}`}
-          >
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src={g.src}
-              alt={g.tag}
-              style={{ width: "100%", aspectRatio: "3/4", objectFit: "cover", display: "block" }}
-            />
-            <span className="pf-card-hint">＋ ver más</span>
-            <span
-              style={{
-                position: "absolute",
-                left: 10,
-                bottom: 10,
-                background: "rgba(250,245,238,0.92)",
-                borderRadius: 999,
-                padding: "5px 14px",
-                fontSize: 12,
-                fontWeight: 600,
-                color: "#221B14",
-              }}
+        {galeria
+          .filter((g) => g.photos.length > 0)
+          .map((g) => (
+            <button
+              key={g.id}
+              type="button"
+              className="pf-card"
+              onClick={() => open(g)}
+              aria-label={`Ver más fotos de ${g.tag}`}
             >
-              {g.tag}
-            </span>
-          </button>
-        ))}
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={g.photos[0].url}
+                alt={g.tag}
+                style={{
+                  width: "100%",
+                  aspectRatio: CROP_ASPECT,
+                  objectFit: "cover",
+                  display: "block",
+                  ...focalStyle(g.photos[0].focal),
+                }}
+              />
+              <span className="pf-card-hint">＋ ver más</span>
+              <span
+                style={{
+                  position: "absolute",
+                  left: 10,
+                  bottom: 10,
+                  background: "rgba(250,245,238,0.92)",
+                  borderRadius: 999,
+                  padding: "5px 14px",
+                  fontSize: 12,
+                  fontWeight: 600,
+                  color: "#221B14",
+                }}
+              >
+                {g.tag}
+              </span>
+            </button>
+          ))}
       </div>
 
       {openItem && (
@@ -124,8 +130,18 @@ export default function PortfolioGallery({ galeria }: { galeria: GaleriaItem[] }
                   ←
                 </button>
               )}
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img key={photos[index]} src={photos[index]} alt={openItem.tag} className="lb-img" />
+              <CroppedImage
+                key={`${photos[index].url}-${index}`}
+                photo={photos[index]}
+                alt={openItem.tag}
+                style={{
+                  maxWidth: "100%",
+                  maxHeight: "62vh",
+                  borderRadius: 18,
+                  boxShadow: "0 40px 90px rgba(0, 0, 0, 0.5)",
+                  animation: "lbImgIn 0.5s cubic-bezier(0.16, 1, 0.3, 1) both",
+                }}
+              />
               {photos.length > 1 && (
                 <button type="button" className="lb-arrow" onClick={next} aria-label="Siguiente">
                   →
@@ -134,16 +150,16 @@ export default function PortfolioGallery({ galeria }: { galeria: GaleriaItem[] }
             </div>
 
             <div className="lb-thumbs">
-              {photos.map((src, i) => (
+              {photos.map((photo, i) => (
                 <button
-                  key={src}
+                  key={`${photo.url}-${i}`}
                   type="button"
                   className={`lb-thumb${i === index ? " lb-thumb-active" : ""}`}
                   onClick={() => setIndex(i)}
                   aria-label={`Foto ${i + 1}`}
                 >
                   {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={src} alt="" />
+                  <img src={photo.url} alt="" style={focalStyle(photo.focal)} />
                 </button>
               ))}
             </div>
