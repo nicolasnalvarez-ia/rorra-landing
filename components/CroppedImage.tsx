@@ -9,13 +9,15 @@ export default function CroppedImage({
   photo,
   alt,
   style,
+  className,
 }: {
   photo: CroppedPhoto;
   alt: string;
   style?: React.CSSProperties;
+  className?: string;
 }) {
   return (
-    <div style={{ overflow: "hidden", aspectRatio: CROP_ASPECT, display: "block", ...style }}>
+    <div className={className} style={{ overflow: "hidden", aspectRatio: CROP_ASPECT, display: "block", ...style }}>
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         src={photo.url}

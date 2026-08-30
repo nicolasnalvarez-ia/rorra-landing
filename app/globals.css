@@ -858,6 +858,53 @@ a:hover {
   cursor: pointer;
 }
 
+/* ── responsive: header reads as a deliberate stack on phones ── */
+.site-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+}
+
+.site-nav {
+  display: flex;
+  justify-content: center;
+  /* Sized so all four links sit on one row down to ~360px wide — a lone
+     wrapped "Contacto" reads as a layout accident. */
+  gap: clamp(12px, 4vw, 20px);
+  font-size: clamp(10px, 2.9vw, 13px);
+  width: 100%;
+  padding-top: 14px;
+  border-top: 1px solid rgba(34, 27, 20, 0.1);
+}
+
+/* The staggered hero photo only reads as intentional once the grid is
+   side-by-side with the copy; on a phone it just looks misaligned. */
+.hero-photo-offset {
+  margin-top: 0;
+}
+
+@media (min-width: 860px) {
+  .site-header {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+  }
+
+  .site-nav {
+    width: auto;
+    justify-content: flex-end;
+    gap: 32px;
+    padding-top: 0;
+    border-top: none;
+  }
+
+  .hero-photo-offset {
+    margin-top: 40px;
+  }
+}
+
 /* ── responsive: stack the hero and sobre-mí grids on narrow screens ── */
 .hero-grid {
   grid-template-columns: 1fr;

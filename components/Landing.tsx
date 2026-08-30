@@ -9,27 +9,20 @@ export default function Landing({ content }: { content: SiteContent }) {
   return (
     <div style={{ minHeight: "100vh", background: "#FAF5EE" }}>
       <header
+        className="site-header"
         style={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-          flexWrap: "wrap",
           padding: "clamp(16px, 4vw, 24px) clamp(20px, 5vw, 48px)",
           maxWidth: 1280,
           margin: "0 auto",
-          gap: 12,
         }}
       >
         <div style={{ fontFamily: "var(--font-instrument-serif), serif", fontSize: 24 }}>Rocío Romero</div>
         <nav
+          className="site-nav"
           style={{
-            display: "flex",
-            gap: "clamp(12px, 3.5vw, 32px)",
-            fontSize: "clamp(11px, 2.4vw, 13px)",
             fontWeight: 600,
             letterSpacing: "0.08em",
             textTransform: "uppercase",
-            flexWrap: "wrap",
           }}
         >
           <a href="#sobre-mi">Sobre mí</a>
@@ -90,7 +83,7 @@ export default function Landing({ content }: { content: SiteContent }) {
               className="btn-dark"
               style={{ padding: "16px 32px", borderRadius: 999, fontSize: 15, fontWeight: 600 }}
             >
-              Trabajemos juntas
+              Trabajemos juntos
             </a>
             <a
               href="#portfolio"
@@ -126,10 +119,10 @@ export default function Landing({ content }: { content: SiteContent }) {
           <CroppedImage
             photo={content.hero.image1}
             alt="Rocío selfie"
+            className="hero-photo-offset"
             style={{
               width: "100%",
               borderRadius: 16,
-              marginTop: 40,
               boxShadow: "0 20px 40px rgba(34,27,20,0.18)",
             }}
           />
@@ -400,7 +393,7 @@ export default function Landing({ content }: { content: SiteContent }) {
               textWrap: "balance",
             }}
           >
-            ¿Hacemos algo juntas? <em style={{ color: "#E8906B" }}>Escribime.</em>
+            ¿Hacemos algo juntos? <em style={{ color: "#E8906B" }}>Escribime.</em>
           </h2>
           <p style={{ fontSize: 17, lineHeight: 1.6, color: "#C9BEB0", margin: 0, maxWidth: "48ch" }}>
             Contame de tu marca y armamos contenido que la gente quiera ver. Respondo rápido.
