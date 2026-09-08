@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { CROP_ASPECT, focalStyle, type GaleriaItem } from "@/lib/content";
+import { focalStyle, type GaleriaItem } from "@/lib/content";
 import CroppedImage from "@/components/CroppedImage";
 
 export default function PortfolioGallery({ galeria }: { galeria: GaleriaItem[] }) {
@@ -10,6 +10,7 @@ export default function PortfolioGallery({ galeria }: { galeria: GaleriaItem[] }
   const [closing, setClosing] = useState(false);
 
   const photos = useMemo(() => openItem?.photos ?? [], [openItem]);
+  const items = galeria.filter((g) => g.photos.length > 0);
 
   const open = (item: GaleriaItem) => {
     setIndex(0);
@@ -22,7 +23,7 @@ export default function PortfolioGallery({ galeria }: { galeria: GaleriaItem[] }
     window.setTimeout(() => {
       setOpenItem(null);
       setClosing(false);
-    }, 280);
+    }, 300);
   }, []);
 
   const next = useCallback(
@@ -51,72 +52,41 @@ export default function PortfolioGallery({ galeria }: { galeria: GaleriaItem[] }
 
   return (
     <>
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(220px, 1fr))", gap: 16 }}>
-        {galeria
-          .filter((g) => g.photos.length > 0)
-          .map((g) => (
-            <button
-              key={g.id}
-              type="button"
-              className="pf-card"
-              onClick={() => open(g)}
-              aria-label={`Ver más fotos de ${g.tag}`}
-            >
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src={g.photos[0].url}
-                alt={g.tag}
-                style={{
-                  width: "100%",
-                  aspectRatio: CROP_ASPECT,
-                  objectFit: "cover",
-                  display: "block",
-                  ...focalStyle(g.photos[0].focal),
-                }}
-              />
-              <span className="pf-card-hint">＋ ver más</span>
-              <span
-                style={{
-                  position: "absolute",
-                  left: 10,
-                  bottom: 10,
-                  background: "rgba(250,245,238,0.92)",
-                  borderRadius: 999,
-                  padding: "5px 14px",
-                  fontSize: 12,
-                  fontWeight: 600,
-                  color: "#221B14",
-                }}
-              >
-                {g.tag}
-              </span>
-            </button>
-          ))}
+      <div className="pf-grid">
+        {items.map((g, i) => (
+          <button
+            key={g.id}
+            type="button"
+            className="pf-item"
+            onClick={() => open(g)}
+            aria-label={`Ver ${g.photos.length} fotos de ${g.tag}`}
+            data-reveal="up"
+            style={{ "--d": `${(i % 3) * 110}ms` } as React.CSSProperties}
+          >
+            <span className="pf-index">{String(i + 1).padStart(2, "0")}</span>
+            <CroppedImage photo={g.photos[0]} alt={g.tag} className="pf-img" />
+            <span className="pf-caption">
+              <span className="pf-tag">{g.tag}</span>
+              <span className="pf-count">{g.photos.length} fotos</span>
+            </span>
+          </button>
+        ))}
       </div>
 
       {openItem && (
         <div
-          className={`lb-backdrop${closing ? " lb-closing" : ""}`}
+          className={`lb${closing ? " is-closing" : ""}`}
           onClick={close}
           role="dialog"
           aria-modal="true"
           aria-label={`Galería ${openItem.tag}`}
         >
           <div className="lb-panel" onClick={(e) => e.stopPropagation()}>
-            <div className="lb-header">
-              <div style={{ display: "flex", alignItems: "baseline", gap: 14 }}>
-                <span
-                  style={{
-                    fontFamily: "var(--font-instrument-serif), serif",
-                    fontStyle: "italic",
-                    fontSize: "clamp(22px, 6vw, 32px)",
-                    lineHeight: 1,
-                  }}
-                >
-                  {openItem.tag}
-                </span>
-                <span style={{ fontSize: 13, letterSpacing: "0.08em", color: "#C9BEB0" }}>
-                  {index + 1} / {photos.length}
+            <div className="lb-head">
+              <div>
+                <span className="lb-title">{openItem.tag}</span>
+                <span className="lb-counter">
+                  {String(index + 1).padStart(2, "0")} / {String(photos.length).padStart(2, "0")}
                 </span>
               </div>
               <button type="button" className="lb-close" onClick={close} aria-label="Cerrar">
@@ -126,7 +96,7 @@ export default function PortfolioGallery({ galeria }: { galeria: GaleriaItem[] }
 
             <div className="lb-stage">
               {photos.length > 1 && (
-                <button type="button" className="lb-arrow" onClick={prev} aria-label="Anterior">
+                <button type="button" className="lb-arrow prev" onClick={prev} aria-label="Anterior">
                   ←
                 </button>
               )}
@@ -134,16 +104,10 @@ export default function PortfolioGallery({ galeria }: { galeria: GaleriaItem[] }
                 key={`${photos[index].url}-${index}`}
                 photo={photos[index]}
                 alt={openItem.tag}
-                style={{
-                  maxWidth: "100%",
-                  maxHeight: "62vh",
-                  borderRadius: 18,
-                  boxShadow: "0 40px 90px rgba(0, 0, 0, 0.5)",
-                  animation: "lbImgIn 0.5s cubic-bezier(0.16, 1, 0.3, 1) both",
-                }}
+                className="lb-img"
               />
               {photos.length > 1 && (
-                <button type="button" className="lb-arrow" onClick={next} aria-label="Siguiente">
+                <button type="button" className="lb-arrow next" onClick={next} aria-label="Siguiente">
                   →
                 </button>
               )}
@@ -154,7 +118,7 @@ export default function PortfolioGallery({ galeria }: { galeria: GaleriaItem[] }
                 <button
                   key={`${photo.url}-${i}`}
                   type="button"
-                  className={`lb-thumb${i === index ? " lb-thumb-active" : ""}`}
+                  className={`lb-thumb${i === index ? " is-active" : ""}`}
                   onClick={() => setIndex(i)}
                   aria-label={`Foto ${i + 1}`}
                 >

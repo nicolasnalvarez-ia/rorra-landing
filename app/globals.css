@@ -1,128 +1,41 @@
+@import "./landing.css";
+
+/* ── base ── */
 html,
 body {
   margin: 0;
   padding: 0;
-  background: #faf5ee;
+  background: #f3eee4;
+}
+
+html {
+  scroll-behavior: smooth;
+  -webkit-text-size-adjust: 100%;
 }
 
 body {
   font-family: var(--font-archivo), sans-serif;
-  color: #221b14;
+  color: #16130f;
+  -webkit-font-smoothing: antialiased;
 }
 
 a {
-  color: #221b14;
+  color: inherit;
   text-decoration: none;
 }
 
-a:hover {
-  color: #c4451c;
-}
-
-@keyframes marquee {
-  from {
-    transform: translateX(0);
-  }
-  to {
-    transform: translateX(-50%);
-  }
-}
-
 ::selection {
-  background: #f2c9b8;
+  background: #e23a1e;
+  color: #f3eee4;
 }
 
-.btn-dark {
-  background: #221b14;
-  color: #faf5ee;
-  transition:
-    background 0.25s ease,
-    color 0.25s ease;
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
 }
 
-.btn-dark:hover {
-  background: #c4451c;
-  color: #faf5ee;
-}
-
-.btn-light {
-  background: #faf5ee;
-  color: #221b14;
-  transition:
-    background 0.25s ease,
-    color 0.25s ease;
-}
-
-.btn-light:hover {
-  background: #e8906b;
-  color: #221b14;
-}
-
-.btn-outline-light {
-  border: 1px solid #5c5248;
-  color: #faf5ee;
-  transition:
-    border-color 0.25s ease,
-    color 0.25s ease;
-}
-
-.btn-outline-light:hover {
-  border-color: #e8906b;
-  color: #e8906b;
-}
-
-/* ── portfolio cards ── */
-.pf-card {
-  position: relative;
-  padding: 0;
-  border: none;
-  border-radius: 14px;
-  overflow: hidden;
-  cursor: pointer;
-  background: #221b14;
-  box-shadow: 0 12px 28px rgba(34, 27, 20, 0.12);
-  transition:
-    transform 0.45s cubic-bezier(0.16, 1, 0.3, 1),
-    box-shadow 0.45s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.pf-card img {
-  transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.pf-card:hover {
-  transform: translateY(-6px);
-  box-shadow: 0 24px 48px rgba(34, 27, 20, 0.22);
-}
-
-.pf-card:hover img {
-  transform: scale(1.06);
-}
-
-.pf-card-hint {
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  background: rgba(34, 27, 20, 0.82);
-  color: #faf5ee;
-  border-radius: 999px;
-  padding: 5px 14px;
-  font-size: 12px;
-  font-weight: 600;
-  opacity: 0;
-  transform: translateY(-6px);
-  transition:
-    opacity 0.35s ease,
-    transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
-  pointer-events: none;
-}
-
-.pf-card:hover .pf-card-hint {
-  opacity: 1;
-  transform: translateY(0);
-}
-
-/* ── lightbox ── */
+/* Shared with the admin modal. */
 @keyframes lbFadeIn {
   from {
     opacity: 0;
@@ -141,163 +54,6 @@ a:hover {
     opacity: 1;
     transform: scale(1) translateY(0);
   }
-}
-
-@keyframes lbImgIn {
-  from {
-    opacity: 0;
-    transform: scale(1.03);
-  }
-  to {
-    opacity: 1;
-    transform: scale(1);
-  }
-}
-
-.lb-backdrop {
-  position: fixed;
-  inset: 0;
-  z-index: 200;
-  background: rgba(20, 15, 10, 0.78);
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: clamp(12px, 4vw, 24px);
-  animation: lbFadeIn 0.3s ease both;
-  transition: opacity 0.28s ease;
-}
-
-.lb-backdrop.lb-closing {
-  opacity: 0;
-}
-
-.lb-panel {
-  width: min(880px, 100%);
-  max-height: 92vh;
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-  color: #faf5ee;
-  animation: lbZoomIn 0.45s cubic-bezier(0.16, 1, 0.3, 1) both;
-  transition:
-    opacity 0.28s ease,
-    transform 0.28s ease;
-}
-
-.lb-closing .lb-panel {
-  opacity: 0;
-  transform: scale(0.95) translateY(12px);
-}
-
-.lb-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.lb-close {
-  background: rgba(250, 245, 238, 0.12);
-  border: none;
-  color: #faf5ee;
-  width: 42px;
-  height: 42px;
-  border-radius: 999px;
-  font-size: 24px;
-  line-height: 1;
-  cursor: pointer;
-  transition:
-    background 0.25s ease,
-    transform 0.25s ease;
-}
-
-.lb-close:hover {
-  background: #c4451c;
-  transform: rotate(90deg);
-}
-
-.lb-stage {
-  position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  min-height: 0;
-  flex: 1;
-}
-
-.lb-arrow {
-  position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
-  z-index: 2;
-  background: rgba(250, 245, 238, 0.12);
-  border: none;
-  color: #faf5ee;
-  width: 46px;
-  height: 46px;
-  border-radius: 999px;
-  font-size: 19px;
-  cursor: pointer;
-  transition:
-    background 0.25s ease,
-    transform 0.25s ease;
-  backdrop-filter: blur(6px);
-}
-
-.lb-arrow:first-of-type {
-  left: 12px;
-}
-
-.lb-arrow:last-of-type {
-  right: 12px;
-}
-
-.lb-arrow:hover {
-  background: #c4451c;
-  transform: translateY(-50%) scale(1.08);
-}
-
-.lb-thumbs {
-  display: flex;
-  gap: 10px;
-  justify-content: center;
-  overflow-x: auto;
-  padding: 4px 2px;
-}
-
-.lb-thumb {
-  flex: 0 0 auto;
-  width: 62px;
-  height: 78px;
-  padding: 0;
-  border: 2px solid transparent;
-  border-radius: 10px;
-  overflow: hidden;
-  cursor: pointer;
-  background: none;
-  opacity: 0.55;
-  transition:
-    opacity 0.25s ease,
-    transform 0.25s ease,
-    border-color 0.25s ease;
-}
-
-.lb-thumb img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  display: block;
-}
-
-.lb-thumb:hover {
-  opacity: 0.85;
-  transform: translateY(-2px);
-}
-
-.lb-thumb-active {
-  opacity: 1;
-  border-color: #e8906b;
 }
 
 /* ══════════════════ admin panel ══════════════════ */
@@ -858,72 +614,3 @@ a:hover {
   cursor: pointer;
 }
 
-/* ── responsive: header reads as a deliberate stack on phones ── */
-.site-header {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 14px;
-}
-
-.site-nav {
-  display: flex;
-  justify-content: center;
-  /* Sized so all four links sit on one row down to ~360px wide — a lone
-     wrapped "Contacto" reads as a layout accident. */
-  gap: clamp(12px, 4vw, 20px);
-  font-size: clamp(10px, 2.9vw, 13px);
-  width: 100%;
-  padding-top: 14px;
-  border-top: 1px solid rgba(34, 27, 20, 0.1);
-}
-
-/* The staggered hero photo only reads as intentional once the grid is
-   side-by-side with the copy; on a phone it just looks misaligned. */
-.hero-photo-offset {
-  margin-top: 0;
-}
-
-@media (min-width: 860px) {
-  .site-header {
-    flex-direction: row;
-    align-items: center;
-    justify-content: space-between;
-    gap: 12px;
-  }
-
-  .site-nav {
-    width: auto;
-    justify-content: flex-end;
-    gap: 32px;
-    padding-top: 0;
-    border-top: none;
-  }
-
-  .hero-photo-offset {
-    margin-top: 40px;
-  }
-}
-
-/* ── responsive: stack the hero and sobre-mí grids on narrow screens ── */
-.hero-grid {
-  grid-template-columns: 1fr;
-  gap: 40px;
-}
-
-.sobre-mi-grid {
-  grid-template-columns: 1fr;
-  gap: 36px;
-}
-
-@media (min-width: 860px) {
-  .hero-grid {
-    grid-template-columns: 1.1fr 0.9fr;
-    gap: 64px;
-  }
-
-  .sobre-mi-grid {
-    grid-template-columns: 0.8fr 1.2fr;
-    gap: 72px;
-  }
-}
