@@ -1027,3 +1027,22 @@ a {
     padding: 20px;
   }
 }
+
+/* ── admin: storage warning ── */
+.adm-banner {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-bottom: 32px;
+  padding: 16px 20px;
+  border-radius: 14px;
+  border: 1.5px solid rgba(168, 73, 44, 0.35);
+  background: rgba(196, 69, 28, 0.07);
+  color: var(--adm-ink);
+  font-size: 14px;
+  line-height: 1.55;
+}
+
+.adm-banner strong {
+  color: #a8492c;
+}

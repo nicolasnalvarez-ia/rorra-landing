@@ -6,16 +6,93 @@
 export const IMAGES_BUCKET = "fotos";
 const DATA_BUCKET = "site-data";
 
+/**
+ * A storage problem the admin can actually act on: a missing env var, a
+ * bucket that was never created, a wrong key. These carry a Spanish message
+ * that the panel shows verbatim, instead of surfacing as an opaque 500.
+ */
+export class StorageError extends Error {
+  readonly status?: number;
+
+  constructor(message: string, status?: number) {
+    super(message);
+    this.name = "StorageError";
+    this.status = status;
+  }
+}
+
+export function isStorageConfigured(): boolean {
+  return Boolean(process.env.SUPABASE_URL && process.env.SUPABASE_SERVICE_ROLE_KEY);
+}
+
+export const MISSING_CONFIG_MESSAGE =
+  "Supabase no está configurado: faltan las variables SUPABASE_URL y/o SUPABASE_SERVICE_ROLE_KEY. " +
+  "Mientras tanto la landing muestra las fotos que vienen con el sitio y el panel no puede guardar.";
+
 function supabaseUrl(): string {
   const url = process.env.SUPABASE_URL;
-  if (!url) throw new Error("SUPABASE_URL environment variable is not set");
-  return url;
+  if (!url) throw new StorageError(MISSING_CONFIG_MESSAGE);
+  // A trailing slash would produce "…co//storage/v1/…", which Supabase rejects.
+  return url.replace(/\/+$/, "");
 }
 
 function serviceRoleKey(): string {
   const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
-  if (!key) throw new Error("SUPABASE_SERVICE_ROLE_KEY environment variable is not set");
+  if (!key) throw new StorageError(MISSING_CONFIG_MESSAGE);
   return key;
+}
+
+/** Turns a failed Supabase response into a message that names the fix. */
+function storageFailure(action: string, bucket: string, status: number, body: string): StorageError {
+  if (status === 401 || status === 403) {
+    return new StorageError(
+      `Supabase rechazó ${action} en el bucket "${bucket}" (${status}). ` +
+        "Revisá que SUPABASE_SERVICE_ROLE_KEY sea la service role key del proyecto, no la anon key.",
+      status
+    );
+  }
+  if (status === 404 || /bucket not found/i.test(body)) {
+    return new StorageError(
+      `No existe el bucket "${bucket}" en Supabase. Crealo como público desde Storage en el panel de Supabase.`,
+      status
+    );
+  }
+  return new StorageError(`Supabase falló al ${action} en el bucket "${bucket}" (${status}).`, status);
+}
+
+export type StorageStatus = { ok: true } | { ok: false; message: string };
+
+/**
+ * Checks that the panel can actually read and write before it lets someone
+ * edit. Without this the panel loads happily on the default content and only
+ * fails on save, which looks like a bug in the app rather than a missing
+ * bucket or key.
+ */
+export async function checkStorage(): Promise<StorageStatus> {
+  if (!isStorageConfigured()) return { ok: false, message: MISSING_CONFIG_MESSAGE };
+
+  for (const bucket of [IMAGES_BUCKET, DATA_BUCKET]) {
+    try {
+      const res = await fetch(`${supabaseUrl()}/storage/v1/bucket/${bucket}`, {
+        headers: authHeaders(),
+        cache: "no-store",
+      });
+      if (!res.ok) {
+        const body = await res.text().catch(() => "");
+        return { ok: false, message: storageFailure("leer", bucket, res.status, body).message };
+      }
+    } catch (err) {
+      if (err instanceof StorageError) return { ok: false, message: err.message };
+      return {
+        ok: false,
+        message:
+          "No se pudo conectar con Supabase. Revisá que SUPABASE_URL apunte al proyecto correcto " +
+          "(tiene que ser la URL del proyecto, por ejemplo https://xxxx.supabase.co).",
+      };
+    }
+  }
+
+  return { ok: true };
 }
 
 function authHeaders(extra?: Record<string, string>): Record<string, string> {
@@ -34,7 +111,7 @@ export async function uploadImage(path: string, body: Blob, contentType: string)
     headers: authHeaders({ "Content-Type": contentType, "x-upsert": "true" }),
     body,
   });
-  if (!res.ok) throw new Error(`Supabase upload failed (${res.status}): ${await res.text()}`);
+  if (!res.ok) throw storageFailure("subir la foto", IMAGES_BUCKET, res.status, await res.text().catch(() => ""));
   return publicUrl(IMAGES_BUCKET, path);
 }
 
@@ -69,7 +146,7 @@ export async function deleteImage(path: string): Promise<void> {
     headers: authHeaders(),
   });
   if (!res.ok && res.status !== 404) {
-    throw new Error(`Supabase delete failed (${res.status}): ${await res.text()}`);
+    throw storageFailure("borrar la foto", IMAGES_BUCKET, res.status, await res.text().catch(() => ""));
   }
 }
 
@@ -89,5 +166,5 @@ export async function putJson(path: string, data: unknown): Promise<void> {
     headers: authHeaders({ "Content-Type": "application/json", "x-upsert": "true" }),
     body: JSON.stringify(data, null, 2),
   });
-  if (!res.ok) throw new Error(`Supabase putJson failed (${res.status}): ${await res.text()}`);
+  if (!res.ok) throw storageFailure("guardar los cambios", DATA_BUCKET, res.status, await res.text().catch(() => ""));
 }

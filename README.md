@@ -58,6 +58,21 @@ Detalles que valen la pena saber:
 - Las fotos que vienen con el proyecto (`public/photos`) se pueden sacar de la
   biblioteca, pero el archivo no se borra.
 
+## Si el panel no guarda
+
+El panel avisa arriba de todo cuando no puede escribir, y el mensaje dice qué
+falta. Los casos posibles:
+
+| Mensaje | Qué hacer |
+| --- | --- |
+| "Supabase no está configurado" | Faltan `SUPABASE_URL` o `SUPABASE_SERVICE_ROLE_KEY`. En Vercel se cargan en Settings → Environment Variables, y hay que volver a deployar para que tomen efecto. |
+| "No existe el bucket …" | Creá ese bucket en Supabase → Storage, marcado como público. |
+| "Supabase rechazó … (401/403)" | La key no es la service role key, o el bucket tiene políticas que bloquean la escritura. |
+
+Una señal rápida de que Supabase no está conectado: la landing muestra las
+fotos de `public/photos` y ninguna con URL de `supabase.co`. Eso pasa porque la
+lectura cae al contenido por defecto cuando el almacenamiento no responde.
+
 Todo lo que el panel guarda se valida en el servidor antes de escribirse
 (`lib/validate.ts`): solo se aceptan URLs de los buckets del proyecto o de
 `public/photos`, y el guardado revalida la landing para que el cambio se vea al

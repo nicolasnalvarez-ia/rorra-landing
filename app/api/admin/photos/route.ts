@@ -1,7 +1,13 @@
 import { revalidatePath } from "next/cache";
 import { NextResponse } from "next/server";
+import { errorResponse } from "@/lib/api-error";
 import { loadStoredData, saveStoredData } from "@/lib/content-store";
-import { deleteImage, imagePathFromUrl } from "@/lib/supabase-storage";
+import {
+  MISSING_CONFIG_MESSAGE,
+  deleteImage,
+  imagePathFromUrl,
+  isStorageConfigured,
+} from "@/lib/supabase-storage";
 import { findUsages, removePhotoFromCategories } from "@/lib/usages";
 
 /**
@@ -15,6 +21,9 @@ export async function DELETE(request: Request) {
   const force = body?.force === true;
 
   if (!url) return NextResponse.json({ error: "Falta la URL de la foto." }, { status: 400 });
+  if (!isStorageConfigured()) {
+    return NextResponse.json({ error: MISSING_CONFIG_MESSAGE }, { status: 503 });
+  }
 
   const data = await loadStoredData();
   const item = data.library.find((l) => l.url === url);
@@ -45,13 +54,17 @@ export async function DELETE(request: Request) {
   const content = usages.length > 0 ? removePhotoFromCategories(data.content, url) : data.content;
   const library = data.library.filter((l) => l.url !== url);
 
-  // Bundled /public/photos files ship with the build; they leave the library
-  // but there's no storage object to remove.
-  const storagePath = item.builtin ? null : imagePathFromUrl(url);
-  if (storagePath) await deleteImage(storagePath);
+  try {
+    // Bundled /public/photos files ship with the build; they leave the library
+    // but there's no storage object to remove.
+    const storagePath = item.builtin ? null : imagePathFromUrl(url);
+    if (storagePath) await deleteImage(storagePath);
 
-  await saveStoredData({ content, library });
-  revalidatePath("/");
+    await saveStoredData({ content, library });
+    revalidatePath("/");
+  } catch (err) {
+    return errorResponse(err, "No se pudo borrar la foto.");
+  }
 
   return NextResponse.json({ ok: true, content, library });
 }

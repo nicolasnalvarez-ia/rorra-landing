@@ -1,5 +1,13 @@
 import { NextResponse } from "next/server";
-import { IMAGES_BUCKET, imageExists, publicUrl, uploadImage } from "@/lib/supabase-storage";
+import { errorResponse } from "@/lib/api-error";
+import {
+  IMAGES_BUCKET,
+  MISSING_CONFIG_MESSAGE,
+  imageExists,
+  isStorageConfigured,
+  publicUrl,
+  uploadImage,
+} from "@/lib/supabase-storage";
 
 const MAX_SIZE = 12 * 1024 * 1024; // 12MB — the client compresses before sending, this is the safety net.
 const EXTENSIONS: Record<string, string> = {
@@ -17,11 +25,8 @@ async function sha256Hex(buffer: ArrayBuffer): Promise<string> {
 }
 
 export async function POST(request: Request) {
-  if (!process.env.SUPABASE_URL || !process.env.SUPABASE_SERVICE_ROLE_KEY) {
-    return NextResponse.json(
-      { error: "El almacenamiento de imágenes (Supabase) no está configurado." },
-      { status: 500 }
-    );
+  if (!isStorageConfigured()) {
+    return NextResponse.json({ error: MISSING_CONFIG_MESSAGE }, { status: 503 });
   }
 
   const formData = await request.formData();
@@ -45,14 +50,18 @@ export async function POST(request: Request) {
   const hash = await sha256Hex(buffer);
   const path = `uploads/${hash}.${extension}`;
 
-  const duplicate = await imageExists(path);
-  const url = duplicate
-    ? publicUrl(IMAGES_BUCKET, path)
-    : await uploadImage(path, new Blob([buffer], { type: file.type }), file.type);
+  try {
+    const duplicate = await imageExists(path);
+    const url = duplicate
+      ? publicUrl(IMAGES_BUCKET, path)
+      : await uploadImage(path, new Blob([buffer], { type: file.type }), file.type);
 
-  return NextResponse.json({
-    url,
-    label: file.name.replace(/\.[a-z0-9]+$/i, "").slice(0, 200) || "foto",
-    duplicate,
-  });
+    return NextResponse.json({
+      url,
+      label: file.name.replace(/\.[a-z0-9]+$/i, "").slice(0, 200) || "foto",
+      duplicate,
+    });
+  } catch (err) {
+    return errorResponse(err, `No se pudo subir "${file.name}".`);
+  }
 }

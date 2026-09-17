@@ -20,6 +20,7 @@ import {
   type SiteContent,
 } from "@/lib/content";
 import { buildSlots } from "@/lib/slots";
+import type { StorageStatus } from "@/lib/supabase-storage";
 import { findUsages } from "@/lib/usages";
 
 type Status = { type: "idle" | "saving" | "saved" | "error"; message?: string };
@@ -40,7 +41,13 @@ function move<T>(items: T[], index: number, direction: -1 | 1): T[] {
   return next;
 }
 
-export default function AdminDashboard({ initialData }: { initialData: StoredData }) {
+export default function AdminDashboard({
+  initialData,
+  storage,
+}: {
+  initialData: StoredData;
+  storage: StorageStatus;
+}) {
   const router = useRouter();
   const [content, setContent] = useState<SiteContent>(initialData.content);
   const [library, setLibraryState] = useState<LibraryItem[]>(initialData.library);
@@ -252,6 +259,10 @@ export default function AdminDashboard({ initialData }: { initialData: StoredDat
     router.refresh();
   }
 
+  // When storage itself is down the banner above already says why; repeating
+  // the same text as a save failure is just noise.
+  const storageMessage = storage.ok ? null : storage.message;
+
   const pickerCategory = pickTarget?.type === "category" ? content.galeria.find((g) => g.id === pickTarget.id) : null;
   const pickerSlotDef = pickTarget?.type === "slot" ? slots.find((s) => s.key === pickTarget.key) : null;
 
@@ -272,7 +283,7 @@ export default function AdminDashboard({ initialData }: { initialData: StoredDat
                   status.type === "error" ? " is-error" : ""
                 }`}
               />
-              {status.type === "saving" ? "Guardando…" : status.message}
+              {status.type === "saving" ? "Guardando…" : status.type === "error" ? "Error" : status.message}
             </span>
           )}
           <a href="/" target="_blank" rel="noopener noreferrer" className="adm-btn adm-btn-ghost">
@@ -288,6 +299,20 @@ export default function AdminDashboard({ initialData }: { initialData: StoredDat
       </header>
 
       <main className="adm-main">
+        {!storage.ok && (
+          <div className="adm-banner" role="alert">
+            <strong>Los cambios no se van a guardar.</strong>
+            <span>{storage.message}</span>
+          </div>
+        )}
+
+        {status.type === "error" && status.message && status.message !== storageMessage && (
+          <div className="adm-banner" role="alert">
+            <strong>Algo falló.</strong>
+            <span>{status.message}</span>
+          </div>
+        )}
+
         {/* HERO / SOBRE MI SLOTS */}
         {["Hero", "Sobre mí"].map((section) => (
           <div className="adm-section" key={section}>
