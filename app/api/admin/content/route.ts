@@ -1,6 +1,8 @@
 import { revalidatePath } from "next/cache";
 import { NextResponse } from "next/server";
-import { loadStoredData, saveStoredData, type StoredData } from "@/lib/content-store";
+import { defaultContent } from "@/lib/content";
+import { loadStoredData, saveStoredData } from "@/lib/content-store";
+import { validateStoredData } from "@/lib/validate";
 
 export async function GET() {
   const data = await loadStoredData();
@@ -8,12 +10,14 @@ export async function GET() {
 }
 
 export async function PUT(request: Request) {
-  const body = (await request.json().catch(() => null)) as StoredData | null;
-  if (!body?.content || !body?.library) {
-    return NextResponse.json({ error: "Payload inválido." }, { status: 400 });
+  const body = await request.json().catch(() => null);
+  const result = validateStoredData(body, defaultContent);
+
+  if (!result.ok) {
+    return NextResponse.json({ error: result.error }, { status: 400 });
   }
 
-  await saveStoredData(body);
+  await saveStoredData(result.data);
   revalidatePath("/");
   return NextResponse.json({ ok: true });
 }

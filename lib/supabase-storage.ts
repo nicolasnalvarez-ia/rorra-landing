@@ -3,7 +3,7 @@
 // so it needs to work in both the Node runtime (API routes) and the Edge
 // runtime (middleware, for the admin session/credentials check).
 
-const IMAGES_BUCKET = "fotos";
+export const IMAGES_BUCKET = "fotos";
 const DATA_BUCKET = "site-data";
 
 function supabaseUrl(): string {
@@ -36,6 +36,41 @@ export async function uploadImage(path: string, body: Blob, contentType: string)
   });
   if (!res.ok) throw new Error(`Supabase upload failed (${res.status}): ${await res.text()}`);
   return publicUrl(IMAGES_BUCKET, path);
+}
+
+/**
+ * The storage path inside IMAGES_BUCKET for a public URL we produced, or null
+ * if the URL doesn't point at this project's image bucket (a bundled
+ * /photos/... file, or anything else).
+ */
+export function imagePathFromUrl(url: string): string | null {
+  const prefix = `${supabaseUrl()}/storage/v1/object/public/${IMAGES_BUCKET}/`;
+  if (!url.startsWith(prefix)) return null;
+  const path = url.slice(prefix.length);
+  // Never let a crafted URL escape the bucket prefix we just matched.
+  if (!path || path.includes("..")) return null;
+  return path;
+}
+
+/** True if the object already exists (used to report duplicate uploads). */
+export async function imageExists(path: string): Promise<boolean> {
+  try {
+    const res = await fetch(publicUrl(IMAGES_BUCKET, path), { method: "HEAD", cache: "no-store" });
+    return res.ok;
+  } catch {
+    return false;
+  }
+}
+
+/** Removes an uploaded image. Missing objects are treated as already deleted. */
+export async function deleteImage(path: string): Promise<void> {
+  const res = await fetch(`${supabaseUrl()}/storage/v1/object/${IMAGES_BUCKET}/${path}`, {
+    method: "DELETE",
+    headers: authHeaders(),
+  });
+  if (!res.ok && res.status !== 404) {
+    throw new Error(`Supabase delete failed (${res.status}): ${await res.text()}`);
+  }
 }
 
 export async function getJson<T>(path: string): Promise<T | null> {

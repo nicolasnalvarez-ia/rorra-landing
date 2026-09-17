@@ -1,36 +1,64 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# rorra-landing
 
-## Getting Started
+Landing de Rocío Romero (content creator / UGC) con un panel de administración
+para manejar las fotos sin tocar código.
 
-First, run the development server:
+## Correr el proyecto
 
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+La landing queda en http://localhost:3000 y el panel en http://localhost:3000/admin.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Variables de entorno
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Copiá `.env.example` a `.env.local` y completá:
 
-## Learn More
+| Variable | Para qué |
+| --- | --- |
+| `ADMIN_PASSWORD` | Contraseña inicial de `/admin`. Se puede cambiar desde el panel sin redeploy. |
+| `SUPABASE_URL` | URL del proyecto de Supabase. |
+| `SUPABASE_SERVICE_ROLE_KEY` | Service role key (no la anon): las subidas y borrados son del lado del servidor. |
 
-To learn more about Next.js, take a look at the following resources:
+En Supabase hacen falta dos buckets **públicos**:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+- `fotos` — las imágenes que se suben desde el panel.
+- `site-data` — el JSON con el contenido del sitio y el hash de la contraseña.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Sin estas variables la landing igual funciona: usa las fotos incluidas en
+`public/photos` y el contenido por defecto de `lib/content.ts`.
 
-## Deploy on Vercel
+## El panel de admin
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+`/admin`, protegido por contraseña (cookie de sesión, sin base de datos).
+Permite:
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- **Hero y Sobre mí**: cambiar cada foto y ajustar el encuadre (posición y zoom
+  sobre un recorte 3:4).
+- **Portfolio**: crear, renombrar, reordenar y borrar categorías; agregar,
+  quitar, reordenar y recortar sus fotos. La primera foto de cada categoría es
+  la portada que se ve en la grilla.
+- **Biblioteca**: subir varias fotos a la vez (arrastrando o eligiendo) y
+  borrarlas de verdad.
+
+Detalles que valen la pena saber:
+
+- **Las fotos se optimizan en el navegador** antes de subirse: se reduce el lado
+  más largo a 2400px y se recodifica a WEBP con calidad alta. Una foto de
+  celular pasa de varios MB a unos cientos de KB sin pérdida visible. Los GIF no
+  se tocan para no perder la animación.
+- **No hay duplicados**: cada archivo se guarda bajo el hash SHA-256 de su
+  contenido, así que subir la misma foto otra vez (aunque tenga otro nombre)
+  reutiliza la que ya estaba.
+- **Borrar borra en serio**: saca la foto de la biblioteca, del portfolio y del
+  storage de Supabase. Si está puesta en el Hero o en Sobre mí, primero hay que
+  reemplazarla ahí (esos lugares no pueden quedar vacíos).
+- Las fotos que vienen con el proyecto (`public/photos`) se pueden sacar de la
+  biblioteca, pero el archivo no se borra.
+
+Todo lo que el panel guarda se valida en el servidor antes de escribirse
+(`lib/validate.ts`): solo se aceptan URLs de los buckets del proyecto o de
+`public/photos`, y el guardado revalida la landing para que el cambio se vea al
+instante.

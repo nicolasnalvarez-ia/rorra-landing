@@ -185,4 +185,6 @@ export type LibraryItem = {
   id: string;
   url: string;
   label: string;
+  /** Shipped in /public/photos: can leave the library, but never gets deleted from storage. */
+  builtin?: boolean;
 };
