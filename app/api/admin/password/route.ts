@@ -1,5 +1,7 @@
 import { NextResponse } from "next/server";
+import { errorResponse } from "@/lib/api-error";
 import { ADMIN_COOKIE, getSessionToken, isValidPassword, setPassword } from "@/lib/auth";
+import { MISSING_CONFIG_MESSAGE, isStorageConfigured } from "@/lib/supabase-storage";
 
 export async function PUT(request: Request) {
   const body = await request.json().catch(() => null);
@@ -19,7 +21,15 @@ export async function PUT(request: Request) {
     return NextResponse.json({ error: "La contraseña actual no es correcta." }, { status: 401 });
   }
 
-  await setPassword(newPassword);
+  if (!isStorageConfigured()) {
+    return NextResponse.json({ error: MISSING_CONFIG_MESSAGE }, { status: 503 });
+  }
+
+  try {
+    await setPassword(newPassword);
+  } catch (err) {
+    return errorResponse(err, "No se pudo cambiar la contraseña.");
+  }
 
   // Re-issue the session cookie: the old one was derived from the old
   // password's hash and would otherwise stop working immediately.
