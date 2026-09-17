@@ -2,7 +2,9 @@
 
 import { useRef, useState } from "react";
 import type { LibraryItem } from "@/lib/content";
+import { ACCEPTED_TYPES, uploadPhoto } from "@/lib/upload-client";
 
+/** Single-file upload used inside the picker ("subir y elegir de una"). */
 export default function UploadButton({
   onUploaded,
   onError,
@@ -22,12 +24,8 @@ export default function UploadButton({
     if (!file) return;
     setUploading(true);
     try {
-      const formData = new FormData();
-      formData.append("file", file);
-      const res = await fetch("/api/admin/upload", { method: "POST", body: formData });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "No se pudo subir la imagen.");
-      onUploaded({ id: data.url, url: data.url, label: data.label });
+      const { item } = await uploadPhoto(file);
+      onUploaded(item);
     } catch (err) {
       onError(err instanceof Error ? err.message : "No se pudo subir la imagen.");
     } finally {
@@ -42,7 +40,7 @@ export default function UploadButton({
       <input
         ref={inputRef}
         type="file"
-        accept="image/png,image/jpeg,image/webp,image/gif"
+        accept={ACCEPTED_TYPES.join(",")}
         onChange={onChange}
         disabled={uploading}
         aria-label={label}

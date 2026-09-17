@@ -20,6 +20,7 @@ function bundledLibrary(): LibraryItem[] {
     id: file,
     url: `/photos/${file}`,
     label: file.replace(/\.[a-z]+$/i, "").replace(/-/g, " "),
+    builtin: true,
   }));
 }
 

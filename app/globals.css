@@ -614,3 +614,416 @@ a {
   cursor: pointer;
 }
 
+
+/* ── admin: slots ── */
+.adm-slot-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 18px;
+}
+
+.adm-slot-name {
+  font-weight: 700;
+  font-size: 14px;
+}
+
+/* ── admin: category ordering & photo tiles ── */
+.adm-cat-order {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 0 0 auto;
+}
+
+.adm-move-btn {
+  width: 24px;
+  height: 20px;
+  border: 1px solid var(--adm-line);
+  background: var(--adm-white);
+  color: var(--adm-muted);
+  border-radius: 6px;
+  font-size: 11px;
+  line-height: 1;
+  cursor: pointer;
+  transition:
+    border-color 0.2s ease,
+    color 0.2s ease;
+}
+
+.adm-move-btn:hover:not(:disabled) {
+  border-color: var(--adm-accent);
+  color: var(--adm-accent);
+}
+
+.adm-move-btn:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
+.adm-cat-count {
+  font-size: 12px;
+  color: var(--adm-muted);
+  white-space: nowrap;
+}
+
+.adm-cat-empty {
+  margin: 12px 0 0;
+  font-size: 13px;
+  color: var(--adm-muted);
+}
+
+.adm-cat-photos .adm-photo-tile,
+.adm-cat-photos .adm-photo-add {
+  width: 104px;
+  height: 104px;
+}
+
+.adm-photo-tile.is-cover {
+  outline: 2px solid var(--adm-accent);
+  outline-offset: 2px;
+}
+
+.adm-cover-badge {
+  position: absolute;
+  left: 4px;
+  top: 4px;
+  background: var(--adm-accent);
+  color: #fff;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  padding: 2px 7px;
+  border-radius: 999px;
+  pointer-events: none;
+}
+
+.adm-tile-actions {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  justify-content: center;
+  gap: 3px;
+  padding: 5px 4px;
+  background: linear-gradient(to top, rgba(34, 27, 20, 0.85), transparent);
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.adm-photo-tile:hover .adm-tile-actions {
+  opacity: 1;
+}
+
+.adm-tile-btn {
+  width: 26px;
+  height: 24px;
+  border-radius: 6px;
+  border: none;
+  background: rgba(250, 245, 238, 0.9);
+  color: var(--adm-ink);
+  font-size: 12px;
+  line-height: 1;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.adm-tile-btn:hover:not(:disabled) {
+  background: var(--adm-accent);
+  color: #fff;
+}
+
+.adm-tile-btn:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+/* Touch devices have no hover: keep the controls visible instead of unreachable. */
+@media (hover: none) {
+  .adm-photo-remove,
+  .adm-tile-actions {
+    opacity: 1;
+  }
+}
+
+/* ── admin: upload zone ── */
+.adm-uploader {
+  margin-bottom: 20px;
+}
+
+.adm-dropzone {
+  position: relative;
+  border: 1.5px dashed rgba(34, 27, 20, 0.28);
+  border-radius: 14px;
+  padding: 26px 20px;
+  text-align: center;
+  background: rgba(255, 253, 250, 0.6);
+  transition:
+    border-color 0.2s ease,
+    background 0.2s ease;
+}
+
+.adm-dropzone.is-dragging {
+  border-color: var(--adm-accent);
+  background: rgba(196, 69, 28, 0.06);
+}
+
+.adm-dropzone input[type="file"] {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.adm-dropzone-text {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  pointer-events: none;
+}
+
+.adm-dropzone-text strong {
+  font-size: 15px;
+}
+
+.adm-dropzone-text span {
+  font-size: 13px;
+  color: var(--adm-muted);
+}
+
+.adm-joblist {
+  list-style: none;
+  margin: 12px 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.adm-job {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 13px;
+  padding: 6px 12px;
+  border-radius: 8px;
+  background: var(--adm-white);
+  border: 1px solid var(--adm-line);
+}
+
+.adm-job-icon {
+  width: 16px;
+  text-align: center;
+  font-weight: 700;
+}
+
+.adm-job-name {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.adm-job-detail {
+  color: var(--adm-muted);
+  font-size: 12px;
+  white-space: nowrap;
+}
+
+.adm-job.is-done .adm-job-icon {
+  color: #2f7a4d;
+}
+
+.adm-job.is-duplicate .adm-job-icon {
+  color: #a8792c;
+}
+
+.adm-job.is-error .adm-job-icon {
+  color: var(--adm-accent);
+}
+
+.adm-job.is-error .adm-job-detail {
+  color: var(--adm-accent);
+}
+
+/* ── admin: library grid ── */
+.adm-lib-count {
+  font-size: 13px;
+  color: var(--adm-muted);
+}
+
+.adm-lib-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(104px, 1fr));
+  gap: 14px;
+}
+
+.adm-lib-card {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.adm-lib-card .adm-photo-tile {
+  width: 100%;
+  height: auto;
+  aspect-ratio: 1/1;
+}
+
+.adm-lib-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 0;
+}
+
+.adm-lib-label {
+  font-size: 12px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.adm-lib-uses {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  color: var(--adm-accent);
+}
+
+.adm-lib-uses.is-unused {
+  color: var(--adm-muted);
+  font-weight: 400;
+}
+
+/* ── admin: picker extras ── */
+.adm-picker-search {
+  width: 100%;
+  margin-bottom: 14px;
+}
+
+.adm-picker-item.is-used {
+  cursor: default;
+  opacity: 0.45;
+}
+
+.adm-picker-item.is-used:hover {
+  transform: none;
+}
+
+.adm-picker-item {
+  position: relative;
+}
+
+.adm-picker-used {
+  position: absolute;
+  left: 50%;
+  bottom: 8px;
+  transform: translateX(-50%);
+  background: rgba(34, 27, 20, 0.85);
+  color: #faf5ee;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 999px;
+}
+
+.adm-empty-note {
+  margin: 16px 0 0;
+  font-size: 13px;
+  color: var(--adm-muted);
+  text-align: center;
+}
+
+/* ── admin: confirm modal ── */
+.adm-modal-sm {
+  max-width: 460px;
+}
+
+.adm-confirm-text {
+  margin: 0 0 12px;
+  font-size: 14px;
+  line-height: 1.55;
+  color: var(--adm-ink);
+}
+
+.adm-confirm-list {
+  margin: 0 0 16px;
+  padding-left: 18px;
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--adm-muted);
+}
+
+.adm-confirm-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.adm-btn-destructive {
+  background: #a8492c;
+  color: #fff;
+}
+
+.adm-btn-destructive:hover:not(:disabled) {
+  background: #8d3a20;
+}
+
+/* ── admin: phones ── */
+@media (max-width: 640px) {
+  .adm-header {
+    padding: 16px 20px;
+    align-items: flex-start;
+  }
+
+  .adm-main {
+    padding: 28px 20px 80px;
+  }
+
+  .adm-cat-card {
+    padding: 14px 14px 16px;
+  }
+
+  /* The header row (order arrows + name + count + delete) can't fit on one
+     line at this width, so let it wrap instead of pushing the card wider. */
+  .adm-cat-head {
+    flex-wrap: wrap;
+    row-gap: 10px;
+  }
+
+  .adm-tag-input {
+    flex: 1 1 140px;
+    min-width: 0;
+  }
+
+  /* The input's 220px minimum plus the button doesn't fit; stack them. */
+  .adm-new-cat {
+    flex-wrap: wrap;
+  }
+
+  .adm-new-cat .adm-input,
+  .adm-new-cat .adm-btn {
+    flex: 1 1 100%;
+  }
+
+  .adm-cat-photos .adm-photo-tile,
+  .adm-cat-photos .adm-photo-add {
+    width: 88px;
+    height: 88px;
+  }
+
+  .adm-section-desc {
+    max-width: none;
+  }
+
+  .adm-lib-grid {
+    grid-template-columns: repeat(auto-fill, minmax(88px, 1fr));
+  }
+
+  .adm-modal {
+    padding: 20px;
+  }
+}

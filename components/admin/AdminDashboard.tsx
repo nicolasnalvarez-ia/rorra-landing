@@ -4,9 +4,10 @@ import { useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import CategoryCard from "@/components/admin/CategoryCard";
 import ChangePasswordModal from "@/components/admin/ChangePasswordModal";
+import ConfirmModal, { type ConfirmRequest } from "@/components/admin/ConfirmModal";
 import CropStep from "@/components/admin/CropStep";
 import ImagePicker from "@/components/admin/ImagePicker";
-import UploadButton from "@/components/admin/UploadButton";
+import UploadZone from "@/components/admin/UploadZone";
 import type { StoredData } from "@/lib/content-store";
 import {
   DEFAULT_FOCAL,
@@ -19,6 +20,7 @@ import {
   type SiteContent,
 } from "@/lib/content";
 import { buildSlots } from "@/lib/slots";
+import { findUsages } from "@/lib/usages";
 
 type Status = { type: "idle" | "saving" | "saved" | "error"; message?: string };
 
@@ -29,6 +31,14 @@ type PickTarget = { type: "slot"; key: string } | { type: "category"; id: string
 // After a pick (or when re-editing an existing photo's crop), this holds
 // what to crop and what to do with the result.
 type CropTarget = { url: string; initialFocal: FocalPoint; onConfirm: (photo: CroppedPhoto) => void };
+
+function move<T>(items: T[], index: number, direction: -1 | 1): T[] {
+  const target = index + direction;
+  if (target < 0 || target >= items.length) return items;
+  const next = [...items];
+  [next[index], next[target]] = [next[target], next[index]];
+  return next;
+}
 
 export default function AdminDashboard({ initialData }: { initialData: StoredData }) {
   const router = useRouter();
@@ -44,11 +54,23 @@ export default function AdminDashboard({ initialData }: { initialData: StoredDat
   }
   const [pickTarget, setPickTarget] = useState<PickTarget | null>(null);
   const [cropTarget, setCropTarget] = useState<CropTarget | null>(null);
+  const [confirmRequest, setConfirmRequest] = useState<ConfirmRequest | null>(null);
   const [status, setStatus] = useState<Status>({ type: "idle" });
   const [newCategoryTag, setNewCategoryTag] = useState("");
   const [changingPassword, setChangingPassword] = useState(false);
 
   const slots = useMemo(() => buildSlots(), []);
+
+  // How many places each photo appears, for the library's "en uso" badges.
+  const usageCounts = useMemo(() => {
+    const counts = new Map<string, number>();
+    const bump = (url: string) => counts.set(url, (counts.get(url) ?? 0) + 1);
+    bump(content.hero.image1.url);
+    bump(content.hero.image2.url);
+    bump(content.sobreMi.image.url);
+    content.galeria.forEach((cat) => cat.photos.forEach((p) => bump(p.url)));
+    return counts;
+  }, [content]);
 
   async function persist(nextContent: SiteContent, nextLibrary: LibraryItem[]) {
     setStatus({ type: "saving" });
@@ -58,16 +80,23 @@ export default function AdminDashboard({ initialData }: { initialData: StoredDat
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ content: nextContent, library: nextLibrary }),
       });
-      if (!res.ok) throw new Error("save failed");
+      const data = await res.json().catch(() => null);
+      if (!res.ok) throw new Error(data?.error || "No se pudieron guardar los cambios");
       setStatus({ type: "saved", message: "Cambios guardados" });
-    } catch {
-      setStatus({ type: "error", message: "No se pudieron guardar los cambios" });
+    } catch (err) {
+      setStatus({
+        type: "error",
+        message: err instanceof Error ? err.message : "No se pudieron guardar los cambios",
+      });
     }
   }
 
   function addToLibrary(item: LibraryItem) {
     const prev = libraryRef.current;
-    setLibrary(prev.some((l) => l.url === item.url) ? prev : [item, ...prev]);
+    if (prev.some((l) => l.url === item.url)) return;
+    const next = [item, ...prev];
+    setLibrary(next);
+    persist(content, next);
   }
 
   function assignSlot(slotKey: string, photo: CroppedPhoto) {
@@ -88,13 +117,23 @@ export default function AdminDashboard({ initialData }: { initialData: StoredDat
     updateGaleria((galeria) => galeria.map((g) => (g.id === id ? { ...g, tag } : g)));
   }
 
-  function deleteCategory(id: string) {
-    updateGaleria((galeria) => galeria.filter((g) => g.id !== id));
+  function deleteCategory(category: GaleriaItem) {
+    setConfirmRequest({
+      title: "Eliminar categoría",
+      message: `Se va a sacar "${category.tag}" del portfolio. Las fotos siguen en la biblioteca.`,
+      confirmLabel: "Eliminar",
+      danger: true,
+      onConfirm: () => updateGaleria((galeria) => galeria.filter((g) => g.id !== category.id)),
+    });
   }
 
   function addCategory() {
     const tag = newCategoryTag.trim();
     if (!tag) return;
+    if (content.galeria.some((g) => g.tag.toLowerCase() === tag.toLowerCase())) {
+      setStatus({ type: "error", message: `Ya existe una categoría llamada "${tag}".` });
+      return;
+    }
     updateGaleria((galeria) => [...galeria, { id: newId(), tag, photos: [] }]);
     setNewCategoryTag("");
   }
@@ -105,9 +144,23 @@ export default function AdminDashboard({ initialData }: { initialData: StoredDat
     );
   }
 
+  function movePhoto(categoryId: string, index: number, direction: -1 | 1) {
+    updateGaleria((galeria) =>
+      galeria.map((g) => (g.id === categoryId ? { ...g, photos: move(g.photos, index, direction) } : g))
+    );
+  }
+
+  function moveCategory(index: number, direction: -1 | 1) {
+    updateGaleria((galeria) => move(galeria, index, direction));
+  }
+
   function addPhotoToCategory(categoryId: string, photo: CroppedPhoto) {
     updateGaleria((galeria) =>
-      galeria.map((g) => (g.id === categoryId ? { ...g, photos: [...g.photos, photo] } : g))
+      galeria.map((g) =>
+        g.id === categoryId && !g.photos.some((p) => p.url === photo.url)
+          ? { ...g, photos: [...g.photos, photo] }
+          : g
+      )
     );
   }
 
@@ -132,7 +185,9 @@ export default function AdminDashboard({ initialData }: { initialData: StoredDat
     const target = pickTarget;
     setPickTarget(null);
     const initialFocal =
-      target.type === "slot" ? slots.find((s) => s.key === target.key)?.get(content).focal ?? DEFAULT_FOCAL : DEFAULT_FOCAL;
+      target.type === "slot"
+        ? slots.find((s) => s.key === target.key)?.get(content).focal ?? DEFAULT_FOCAL
+        : DEFAULT_FOCAL;
     setCropTarget({
       url,
       initialFocal,
@@ -143,27 +198,52 @@ export default function AdminDashboard({ initialData }: { initialData: StoredDat
     });
   }
 
-  function findUsages(url: string): string[] {
-    const usages: string[] = [];
-    if (content.hero.image1.url === url) usages.push("Hero, foto 1");
-    if (content.hero.image2.url === url) usages.push("Hero, foto 2");
-    if (content.sobreMi.image.url === url) usages.push("Sobre mí");
-    content.galeria.forEach((g) => {
-      if (g.photos.some((p) => p.url === url)) usages.push(`Portfolio · ${g.tag}`);
-    });
-    return usages;
+  /** Deletes for real: storage object, library entry, and any portfolio use. */
+  async function deletePhoto(item: LibraryItem, force: boolean) {
+    setStatus({ type: "saving" });
+    try {
+      const res = await fetch("/api/admin/photos", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ url: item.url, force }),
+      });
+      const data = await res.json().catch(() => null);
+
+      if (res.status === 409 && data?.needsConfirmation) {
+        setStatus({ type: "idle" });
+        setConfirmRequest({
+          title: "La foto está en uso",
+          message: `"${item.label}" se está mostrando en el portfolio. Si la borrás, también se saca de ahí.`,
+          details: data.usages,
+          confirmLabel: "Borrar igual",
+          danger: true,
+          onConfirm: () => deletePhoto(item, true),
+        });
+        return;
+      }
+
+      if (!res.ok) throw new Error(data?.error || "No se pudo borrar la foto.");
+
+      setContent(data.content);
+      setLibrary(data.library);
+      setStatus({ type: "saved", message: "Foto eliminada" });
+    } catch (err) {
+      setStatus({ type: "error", message: err instanceof Error ? err.message : "No se pudo borrar la foto." });
+    }
   }
 
-  function deleteFromLibrary(item: LibraryItem) {
-    const usages = findUsages(item.url);
-    const question =
-      usages.length > 0
-        ? `Esta foto se está usando en: ${usages.join(", ")}. Si la sacás de la biblioteca vas a dejar de poder elegirla para nuevos lugares, pero va a seguir viéndose donde ya está puesta. ¿Sacarla igual?`
-        : "¿Sacar esta foto de la biblioteca?";
-    if (!window.confirm(question)) return;
-    const nextLibrary = libraryRef.current.filter((l) => l.id !== item.id);
-    setLibrary(nextLibrary);
-    persist(content, nextLibrary);
+  function confirmDelete(item: LibraryItem) {
+    const usages = findUsages(content, item.url).map((u) => u.label);
+    setConfirmRequest({
+      title: item.builtin ? "Sacar de la biblioteca" : "Borrar foto",
+      message: item.builtin
+        ? `"${item.label}" viene incluida con el sitio: se saca de la biblioteca pero el archivo no se borra.`
+        : `"${item.label}" se va a borrar definitivamente del almacenamiento. No se puede deshacer.`,
+      details: usages.length > 0 ? usages : undefined,
+      confirmLabel: item.builtin ? "Sacar" : "Borrar",
+      danger: true,
+      onConfirm: () => deletePhoto(item, false),
+    });
   }
 
   async function logout() {
@@ -184,10 +264,14 @@ export default function AdminDashboard({ initialData }: { initialData: StoredDat
           </div>
           <div className="adm-subtitle">Elegí las imágenes y organizá las categorías del portfolio.</div>
         </div>
-        <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 16, flexWrap: "wrap" }}>
           {status.type !== "idle" && (
             <span className="adm-status">
-              <span className={`adm-status-dot${status.type === "saving" ? " is-saving" : ""}${status.type === "error" ? " is-error" : ""}`} />
+              <span
+                className={`adm-status-dot${status.type === "saving" ? " is-saving" : ""}${
+                  status.type === "error" ? " is-error" : ""
+                }`}
+              />
               {status.type === "saving" ? "Guardando…" : status.message}
             </span>
           )}
@@ -210,7 +294,7 @@ export default function AdminDashboard({ initialData }: { initialData: StoredDat
             <div className="adm-section-head">
               <div className="adm-section-title">{section}</div>
             </div>
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))", gap: 18 }}>
+            <div className="adm-slot-grid">
               {slots
                 .filter((s) => s.section === section)
                 .map((slot) => {
@@ -225,7 +309,8 @@ export default function AdminDashboard({ initialData }: { initialData: StoredDat
                         style={focalStyle(photo.focal)}
                       />
                       <div className="adm-slot-body">
-                        <div className="adm-slot-label">{slot.label}</div>
+                        <div className="adm-slot-name">{slot.label}</div>
+                        <div className="adm-slot-label">{slot.hint}</div>
                         <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
                           <button
                             className="adm-btn adm-btn-primary"
@@ -260,19 +345,21 @@ export default function AdminDashboard({ initialData }: { initialData: StoredDat
             <div>
               <div className="adm-section-title">Portfolio</div>
               <p className="adm-section-desc">
-                Cada categoría aparece como una tarjeta en el portfolio. Podés agregar, renombrar o eliminar
-                categorías, sumar o quitar fotos, y ajustar cómo se recorta cada una.
+                Cada categoría es una tarjeta del portfolio, en este mismo orden. La primera foto de cada una
+                es la portada que se ve en la grilla; el resto aparece al abrirla.
               </p>
             </div>
           </div>
 
           <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-            {content.galeria.map((cat) => (
+            {content.galeria.map((cat, index) => (
               <CategoryCard
                 key={cat.id}
                 category={cat}
+                canMoveUp={index > 0}
+                canMoveDown={index < content.galeria.length - 1}
                 onRename={(tag) => renameCategory(cat.id, tag)}
-                onDelete={() => deleteCategory(cat.id)}
+                onDelete={() => deleteCategory(cat)}
                 onRemovePhoto={(i) => removePhoto(cat.id, i)}
                 onEditCrop={(i) =>
                   setCropTarget({
@@ -282,6 +369,8 @@ export default function AdminDashboard({ initialData }: { initialData: StoredDat
                   })
                 }
                 onAddPhoto={() => setPickTarget({ type: "category", id: cat.id })}
+                onMovePhoto={(i, direction) => movePhoto(cat.id, i, direction)}
+                onMoveCategory={(direction) => moveCategory(index, direction)}
               />
             ))}
 
@@ -292,7 +381,6 @@ export default function AdminDashboard({ initialData }: { initialData: StoredDat
                 value={newCategoryTag}
                 onChange={(e) => setNewCategoryTag(e.target.value)}
                 onKeyDown={(e) => e.key === "Enter" && addCategory()}
-                style={{ flex: 1, minWidth: 200 }}
               />
               <button className="adm-btn adm-btn-primary" onClick={addCategory} disabled={!newCategoryTag.trim()}>
                 ＋ Nueva categoría
@@ -307,34 +395,46 @@ export default function AdminDashboard({ initialData }: { initialData: StoredDat
             <div>
               <div className="adm-section-title">Biblioteca de fotos</div>
               <p className="adm-section-desc">
-                Subí fotos nuevas acá para tenerlas disponibles en cualquier parte de la landing. El encuadre
-                se elige después, al ponerlas en el Hero, Sobre mí o el portfolio. JPG, PNG, WEBP o GIF,
-                hasta 8MB.
+                Todo lo que subas queda disponible para el Hero, Sobre mí y el portfolio. Las fotos se
+                optimizan solas antes de subirse, y si subís una que ya estaba no se duplica.
               </p>
             </div>
-            <UploadButton
-              label="＋ Subir foto"
-              className="adm-btn adm-btn-primary"
-              onUploaded={(item) => addToLibrary(item)}
-              onError={onError}
-            />
+            <span className="adm-lib-count">
+              {library.length} {library.length === 1 ? "foto" : "fotos"}
+            </span>
           </div>
-          <div className="adm-cat-photos">
-            {library.map((item) => (
-              <div className="adm-photo-tile" key={item.id} title={item.label}>
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={item.url} alt={item.label} />
-                <button
-                  type="button"
-                  className="adm-photo-remove"
-                  onClick={() => deleteFromLibrary(item)}
-                  aria-label="Sacar de la biblioteca"
-                  title="Sacar de la biblioteca"
-                >
-                  ×
-                </button>
-              </div>
-            ))}
+
+          <UploadZone onUploaded={addToLibrary} isKnown={(url) => libraryRef.current.some((l) => l.url === url)} />
+
+          <div className="adm-lib-grid">
+            {library.map((item) => {
+              const uses = usageCounts.get(item.url) ?? 0;
+              return (
+                <div className="adm-lib-card" key={item.id}>
+                  <div className="adm-photo-tile adm-lib-tile">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src={item.url} alt={item.label} />
+                    <button
+                      type="button"
+                      className="adm-photo-remove"
+                      onClick={() => confirmDelete(item)}
+                      aria-label={item.builtin ? "Sacar de la biblioteca" : "Borrar foto"}
+                      title={item.builtin ? "Sacar de la biblioteca" : "Borrar foto"}
+                    >
+                      ×
+                    </button>
+                  </div>
+                  <div className="adm-lib-meta">
+                    <span className="adm-lib-label" title={item.label}>
+                      {item.label}
+                    </span>
+                    <span className={`adm-lib-uses${uses === 0 ? " is-unused" : ""}`}>
+                      {uses === 0 ? "sin usar" : `en uso · ${uses}`}
+                    </span>
+                  </div>
+                </div>
+              );
+            })}
           </div>
         </div>
       </main>
@@ -354,6 +454,7 @@ export default function AdminDashboard({ initialData }: { initialData: StoredDat
         <ImagePicker
           title={`Agregar foto a "${pickerCategory.tag}"`}
           library={library}
+          alreadyUsedUrls={pickerCategory.photos.map((p) => p.url)}
           onPick={onPicked}
           onClose={() => setPickTarget(null)}
           onUploaded={addToLibrary}
@@ -372,6 +473,8 @@ export default function AdminDashboard({ initialData }: { initialData: StoredDat
           onClose={() => setCropTarget(null)}
         />
       )}
+
+      {confirmRequest && <ConfirmModal request={confirmRequest} onClose={() => setConfirmRequest(null)} />}
 
       {changingPassword && <ChangePasswordModal onClose={() => setChangingPassword(false)} />}
     </div>
