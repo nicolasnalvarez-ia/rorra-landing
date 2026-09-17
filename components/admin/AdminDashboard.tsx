@@ -8,11 +8,11 @@ import ConfirmModal, { type ConfirmRequest } from "@/components/admin/ConfirmMod
 import CropStep from "@/components/admin/CropStep";
 import ImagePicker from "@/components/admin/ImagePicker";
 import UploadZone from "@/components/admin/UploadZone";
+import CroppedImage from "@/components/CroppedImage";
 import type { StoredData } from "@/lib/content-store";
 import {
   DEFAULT_FOCAL,
   croppedPhoto,
-  focalStyle,
   type CroppedPhoto,
   type FocalPoint,
   type GaleriaItem,
@@ -326,13 +326,7 @@ export default function AdminDashboard({
                   const photo = slot.get(content);
                   return (
                     <div key={slot.key} className="adm-slot-card">
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img
-                        src={photo.url}
-                        alt={slot.label}
-                        className="adm-slot-img"
-                        style={focalStyle(photo.focal)}
-                      />
+                      <CroppedImage photo={photo} alt={slot.label} className="adm-slot-img" />
                       <div className="adm-slot-body">
                         <div className="adm-slot-name">{slot.label}</div>
                         <div className="adm-slot-label">{slot.hint}</div>

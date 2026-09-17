@@ -273,11 +273,10 @@ a {
   box-shadow: 0 8px 22px rgba(34, 27, 20, 0.06);
 }
 
+/* CroppedImage sets aspect-ratio (3:4, same as the site) and overflow: hidden,
+   which is what keeps a zoomed-in crop from spilling over the card's text. */
 .adm-slot-img {
   width: 100%;
-  aspect-ratio: 4/3;
-  object-fit: cover;
-  display: block;
   background: #ece3d6;
 }
 
