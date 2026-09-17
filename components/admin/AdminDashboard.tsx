@@ -7,6 +7,7 @@ import ChangePasswordModal from "@/components/admin/ChangePasswordModal";
 import ConfirmModal, { type ConfirmRequest } from "@/components/admin/ConfirmModal";
 import CropStep from "@/components/admin/CropStep";
 import ImagePicker from "@/components/admin/ImagePicker";
+import PhotoViewer from "@/components/admin/PhotoViewer";
 import UploadZone from "@/components/admin/UploadZone";
 import CroppedImage from "@/components/CroppedImage";
 import type { StoredData } from "@/lib/content-store";
@@ -65,6 +66,9 @@ export default function AdminDashboard({
   const [status, setStatus] = useState<Status>({ type: "idle" });
   const [newCategoryTag, setNewCategoryTag] = useState("");
   const [changingPassword, setChangingPassword] = useState(false);
+  // Tracked by URL, not index, so deleting a photo closes the viewer instead of
+  // silently sliding the next one into its place.
+  const [viewerUrl, setViewerUrl] = useState<string | null>(null);
 
   const slots = useMemo(() => buildSlots(), []);
 
@@ -78,6 +82,8 @@ export default function AdminDashboard({
     content.galeria.forEach((cat) => cat.photos.forEach((p) => bump(p.url)));
     return counts;
   }, [content]);
+
+  const viewerIndex = viewerUrl ? library.findIndex((l) => l.url === viewerUrl) : -1;
 
   async function persist(nextContent: SiteContent, nextLibrary: LibraryItem[]) {
     setStatus({ type: "saving" });
@@ -431,8 +437,16 @@ export default function AdminDashboard({
               return (
                 <div className="adm-lib-card" key={item.id}>
                   <div className="adm-photo-tile adm-lib-tile">
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img src={item.url} alt={item.label} />
+                    <button
+                      type="button"
+                      className="adm-tile-open"
+                      onClick={() => setViewerUrl(item.url)}
+                      aria-label={`Ver "${item.label}" en grande`}
+                      title="Ver en grande"
+                    >
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img src={item.url} alt={item.label} />
+                    </button>
                     <button
                       type="button"
                       className="adm-photo-remove"
@@ -457,6 +471,16 @@ export default function AdminDashboard({
           </div>
         </div>
       </main>
+
+      {viewerIndex >= 0 && (
+        <PhotoViewer
+          items={library}
+          index={viewerIndex}
+          uses={usageCounts.get(library[viewerIndex].url) ?? 0}
+          onIndex={(next) => setViewerUrl(library[next].url)}
+          onClose={() => setViewerUrl(null)}
+        />
+      )}
 
       {pickTarget?.type === "slot" && pickerSlotDef && (
         <ImagePicker

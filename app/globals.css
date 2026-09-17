@@ -1045,3 +1045,81 @@ a {
 .adm-banner strong {
   color: #a8492c;
 }
+
+/* ── admin: full-size photo viewer ── */
+
+/* The thumbnail itself is the button that opens the viewer; the delete button
+   sits on top of it, so it needs to win the stacking order. */
+.adm-tile-open {
+  display: block;
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  border: none;
+  background: none;
+  cursor: zoom-in;
+}
+
+.adm-photo-remove,
+.adm-focal-btn,
+.adm-cover-badge,
+.adm-tile-actions {
+  z-index: 2;
+}
+
+.adm-viewer {
+  background: var(--adm-bg, #faf5ee);
+  border-radius: 20px;
+  padding: 20px;
+  max-width: min(760px, 100%);
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  box-shadow: 0 30px 70px rgba(0, 0, 0, 0.35);
+  animation: lbZoomIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.adm-viewer .adm-modal-head {
+  margin-bottom: 0;
+}
+
+.adm-viewer-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+/* min-height: 0 lets the image shrink inside the flex column instead of
+   pushing the nav row off the bottom of the modal. */
+.adm-viewer-stage {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.adm-viewer-stage img {
+  max-width: 100%;
+  max-height: 68vh;
+  width: auto;
+  height: auto;
+  border-radius: 12px;
+  display: block;
+  object-fit: contain;
+}
+
+.adm-viewer-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.adm-viewer-count {
+  font-size: 13px;
+  color: var(--adm-muted);
+}

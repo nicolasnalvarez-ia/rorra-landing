@@ -40,7 +40,8 @@ Permite:
 - **Portfolio**: crear, renombrar, reordenar y borrar categorías; agregar,
   quitar, reordenar y recortar sus fotos. La primera foto de cada categoría es
   la portada que se ve en la grilla.
-- **Biblioteca**: subir varias fotos a la vez (arrastrando o eligiendo) y
+- **Biblioteca**: subir varias fotos a la vez (arrastrando o eligiendo),
+  abrirlas en grande con un clic (con flechas y teclado para recorrerlas) y
   borrarlas de verdad.
 
 Detalles que valen la pena saber:
