@@ -10,12 +10,6 @@ import Portfolio from "@/components/landing/Portfolio";
 import Contact from "@/components/landing/Contact";
 
 export default function Landing({ content }: { content: SiteContent }) {
-  // One cover photo per service row for the cursor-following preview.
-  const covers = [content.hero.image2, content.sobreMi.image, content.hero.image1, ...content.galeria.map((g) => g.photos[0])].filter(
-    Boolean
-  );
-  const previews = content.servicios.map((_, i) => covers[i % covers.length]);
-
   return (
     <div className="site">
       <RevealObserver />
@@ -25,7 +19,7 @@ export default function Landing({ content }: { content: SiteContent }) {
         <Marquee />
         <About sobreMi={content.sobreMi} />
         <Stats />
-        <Services servicios={content.servicios} previews={previews} />
+        <Services servicios={content.servicios} />
         <Portfolio galeria={content.galeria} />
       </main>
       <Contact />
